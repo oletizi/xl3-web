@@ -23,74 +23,74 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
   };
   // Top row knobs (CC 13-20) with red LEDs
   const topKnobs = [
-    { id: "knob-cc13", x: 120, y: 80, cc: 13, ledColor: "led-red" },
-    { id: "knob-cc14", x: 180, y: 80, cc: 14, ledColor: "led-red" },
-    { id: "knob-cc15", x: 240, y: 80, cc: 15, ledColor: "led-red" },
-    { id: "knob-cc16", x: 300, y: 80, cc: 16, ledColor: "led-red" },
-    { id: "knob-cc17", x: 360, y: 80, cc: 17, ledColor: "led-red" },
-    { id: "knob-cc18", x: 420, y: 80, cc: 18, ledColor: "led-red" },
-    { id: "knob-cc19", x: 480, y: 80, cc: 19, ledColor: "led-red" },
-    { id: "knob-cc20", x: 540, y: 80, cc: 20, ledColor: "led-red" },
+    { id: "knob-cc13", x: 140, y: 100, cc: 13, ledColor: "led-red" },
+    { id: "knob-cc14", x: 220, y: 100, cc: 14, ledColor: "led-red" },
+    { id: "knob-cc15", x: 300, y: 100, cc: 15, ledColor: "led-red" },
+    { id: "knob-cc16", x: 380, y: 100, cc: 16, ledColor: "led-red" },
+    { id: "knob-cc17", x: 460, y: 100, cc: 17, ledColor: "led-red" },
+    { id: "knob-cc18", x: 540, y: 100, cc: 18, ledColor: "led-red" },
+    { id: "knob-cc19", x: 620, y: 100, cc: 19, ledColor: "led-red" },
+    { id: "knob-cc20", x: 700, y: 100, cc: 20, ledColor: "led-red" },
   ];
 
   // Middle row knobs (CC 53, CC 22-28) with orange LEDs
   const middleKnobs = [
-    { id: "knob-cc53", x: 120, y: 140, cc: 53, ledColor: "led-orange" },
-    { id: "knob-cc22", x: 180, y: 140, cc: 22, ledColor: "led-orange" },
-    { id: "knob-cc23", x: 240, y: 140, cc: 23, ledColor: "led-orange" },
-    { id: "knob-cc24", x: 300, y: 140, cc: 24, ledColor: "led-orange" },
-    { id: "knob-cc25", x: 360, y: 140, cc: 25, ledColor: "led-orange" },
-    { id: "knob-cc26", x: 420, y: 140, cc: 26, ledColor: "led-orange" },
-    { id: "knob-cc27", x: 480, y: 140, cc: 27, ledColor: "led-orange" },
-    { id: "knob-cc28", x: 540, y: 140, cc: 28, ledColor: "led-orange" },
+    { id: "knob-cc53", x: 140, y: 180, cc: 53, ledColor: "led-orange" },
+    { id: "knob-cc22", x: 220, y: 180, cc: 22, ledColor: "led-orange" },
+    { id: "knob-cc23", x: 300, y: 180, cc: 23, ledColor: "led-orange" },
+    { id: "knob-cc24", x: 380, y: 180, cc: 24, ledColor: "led-orange" },
+    { id: "knob-cc25", x: 460, y: 180, cc: 25, ledColor: "led-orange" },
+    { id: "knob-cc26", x: 540, y: 180, cc: 26, ledColor: "led-orange" },
+    { id: "knob-cc27", x: 620, y: 180, cc: 27, ledColor: "led-orange" },
+    { id: "knob-cc28", x: 700, y: 180, cc: 28, ledColor: "led-orange" },
   ];
 
   // Bottom row knobs (CC 29-36) with yellow LEDs
   const bottomKnobs = [
-    { id: "knob-cc29", x: 120, y: 200, cc: 29, ledColor: "warning" },
-    { id: "knob-cc30", x: 180, y: 200, cc: 30, ledColor: "warning" },
-    { id: "knob-cc31", x: 240, y: 200, cc: 31, ledColor: "warning" },
-    { id: "knob-cc32", x: 300, y: 200, cc: 32, ledColor: "warning" },
-    { id: "knob-cc33", x: 360, y: 200, cc: 33, ledColor: "warning" },
-    { id: "knob-cc34", x: 420, y: 200, cc: 34, ledColor: "warning" },
-    { id: "knob-cc35", x: 480, y: 200, cc: 35, ledColor: "warning" },
-    { id: "knob-cc36", x: 540, y: 200, cc: 36, ledColor: "warning" },
+    { id: "knob-cc29", x: 140, y: 260, cc: 29, ledColor: "warning" },
+    { id: "knob-cc30", x: 220, y: 260, cc: 30, ledColor: "warning" },
+    { id: "knob-cc31", x: 300, y: 260, cc: 31, ledColor: "warning" },
+    { id: "knob-cc32", x: 380, y: 260, cc: 32, ledColor: "warning" },
+    { id: "knob-cc33", x: 460, y: 260, cc: 33, ledColor: "warning" },
+    { id: "knob-cc34", x: 540, y: 260, cc: 34, ledColor: "warning" },
+    { id: "knob-cc35", x: 620, y: 260, cc: 35, ledColor: "warning" },
+    { id: "knob-cc36", x: 700, y: 260, cc: 36, ledColor: "warning" },
   ];
 
   // Vertical faders (CC 5-12)
   const faders = [
-    { id: "fader-cc5", x: 120, y: 280, cc: 5 },
-    { id: "fader-cc6", x: 180, y: 280, cc: 6 },
-    { id: "fader-cc7", x: 240, y: 280, cc: 7 },
-    { id: "fader-cc8", x: 300, y: 280, cc: 8 },
-    { id: "fader-cc9", x: 360, y: 280, cc: 9 },
-    { id: "fader-cc10", x: 420, y: 280, cc: 10 },
-    { id: "fader-cc11", x: 480, y: 280, cc: 11 },
-    { id: "fader-cc12", x: 540, y: 280, cc: 12 },
+    { id: "fader-cc5", x: 140, y: 360, cc: 5 },
+    { id: "fader-cc6", x: 220, y: 360, cc: 6 },
+    { id: "fader-cc7", x: 300, y: 360, cc: 7 },
+    { id: "fader-cc8", x: 380, y: 360, cc: 8 },
+    { id: "fader-cc9", x: 460, y: 360, cc: 9 },
+    { id: "fader-cc10", x: 540, y: 360, cc: 10 },
+    { id: "fader-cc11", x: 620, y: 360, cc: 11 },
+    { id: "fader-cc12", x: 700, y: 360, cc: 12 },
   ];
 
   // Top button row (CC 37-44) - Green LEDs
   const topButtons = [
-    { id: "button-cc37", x: 120, y: 400, cc: 37, ledColor: "led-green" },
-    { id: "button-cc38", x: 180, y: 400, cc: 38, ledColor: "led-green" },
-    { id: "button-cc39", x: 240, y: 400, cc: 39, ledColor: "led-green" },
-    { id: "button-cc40", x: 300, y: 400, cc: 40, ledColor: "led-green" },
-    { id: "button-cc41", x: 360, y: 400, cc: 41, ledColor: "led-green" },
-    { id: "button-cc42", x: 420, y: 400, cc: 42, ledColor: "led-green" },
-    { id: "button-cc43", x: 480, y: 400, cc: 43, ledColor: "led-green" },
-    { id: "button-cc44", x: 540, y: 400, cc: 44, ledColor: "led-green" },
+    { id: "button-cc37", x: 140, y: 500, cc: 37, ledColor: "led-green" },
+    { id: "button-cc38", x: 220, y: 500, cc: 38, ledColor: "led-green" },
+    { id: "button-cc39", x: 300, y: 500, cc: 39, ledColor: "led-green" },
+    { id: "button-cc40", x: 380, y: 500, cc: 40, ledColor: "led-green" },
+    { id: "button-cc41", x: 460, y: 500, cc: 41, ledColor: "led-green" },
+    { id: "button-cc42", x: 540, y: 500, cc: 42, ledColor: "led-green" },
+    { id: "button-cc43", x: 620, y: 500, cc: 43, ledColor: "led-green" },
+    { id: "button-cc44", x: 700, y: 500, cc: 44, ledColor: "led-green" },
   ];
 
   // Bottom button row (CC 45-52) - Blue LEDs
   const bottomButtons = [
-    { id: "button-cc45", x: 120, y: 440, cc: 45, ledColor: "primary" },
-    { id: "button-cc46", x: 180, y: 440, cc: 46, ledColor: "primary" },
-    { id: "button-cc47", x: 240, y: 440, cc: 47, ledColor: "primary" },
-    { id: "button-cc48", x: 300, y: 440, cc: 48, ledColor: "primary" },
-    { id: "button-cc49", x: 360, y: 440, cc: 49, ledColor: "primary" },
-    { id: "button-cc50", x: 420, y: 440, cc: 50, ledColor: "primary" },
-    { id: "button-cc51", x: 480, y: 440, cc: 51, ledColor: "primary" },
-    { id: "button-cc52", x: 540, y: 440, cc: 52, ledColor: "primary" },
+    { id: "button-cc45", x: 140, y: 560, cc: 45, ledColor: "primary" },
+    { id: "button-cc46", x: 220, y: 560, cc: 46, ledColor: "primary" },
+    { id: "button-cc47", x: 300, y: 560, cc: 47, ledColor: "primary" },
+    { id: "button-cc48", x: 380, y: 560, cc: 48, ledColor: "primary" },
+    { id: "button-cc49", x: 460, y: 560, cc: 49, ledColor: "primary" },
+    { id: "button-cc50", x: 540, y: 560, cc: 50, ledColor: "primary" },
+    { id: "button-cc51", x: 620, y: 560, cc: 51, ledColor: "primary" },
+    { id: "button-cc52", x: 700, y: 560, cc: 52, ledColor: "primary" },
   ];
 
   const renderKnob = (knob: any, index: number) => (
@@ -152,19 +152,19 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     <g key={fader.id}>
       {/* Fader Track */}
       <rect 
-        x={fader.x - 6} 
+        x={fader.x - 8} 
         y={fader.y} 
-        width="12" 
-        height="100" 
-        rx="6"
+        width="16" 
+        height="120" 
+        rx="8"
         className="fill-muted stroke-border stroke-2"
       />
       
       {/* Fader Handle */}
       <motion.rect
-        x={fader.x - 12}
-        y={fader.y + 40}
-        width="24"
+        x={fader.x - 15}
+        y={fader.y + 50}
+        width="30"
         height="20"
         rx="4"
         className={`cursor-pointer transition-all duration-200 stroke-2 ${
@@ -183,7 +183,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       {/* CC Number Label */}
       <text 
         x={fader.x} 
-        y={fader.y + 120} 
+        y={fader.y + 140} 
         textAnchor="middle" 
         className="fill-muted-foreground text-xs font-medium"
       >
@@ -196,11 +196,11 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     <g key={button.id}>
       {/* Button Body */}
       <motion.rect
-        x={button.x - 20}
-        y={button.y - 8}
-        width="40"
-        height="16"
-        rx="8"
+        x={button.x - 25}
+        y={button.y - 10}
+        width="50"
+        height="20"
+        rx="10"
         className={`cursor-pointer transition-all duration-200 stroke-2 ${
           selectedControl === button.id 
             ? `fill-hardware-${button.ledColor} stroke-${button.ledColor} shadow-glow-primary` 
@@ -216,11 +216,11 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       
       {/* LED Indicator */}
       <rect 
-        x={button.x - 15} 
-        y={button.y - 5} 
-        width="30" 
-        height="4" 
-        rx="2"
+        x={button.x - 20} 
+        y={button.y - 6} 
+        width="40" 
+        height="6" 
+        rx="3"
         className={`fill-hardware-${button.ledColor} ${
           selectedControl === button.id ? 'animate-pulse' : 'opacity-60'
         }`}
@@ -229,7 +229,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       {/* CC Number Label */}
       <text 
         x={button.x} 
-        y={button.y + 25} 
+        y={button.y + 30} 
         textAnchor="middle" 
         className="fill-muted-foreground text-xs font-medium"
       >
@@ -241,9 +241,9 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
   return (
     <div className="flex justify-center">
       <motion.svg 
-        width="620" 
-        height="500" 
-        viewBox="0 0 620 500"
+        width="880" 
+        height="640" 
+        viewBox="0 0 880 640"
         className="max-w-full h-auto"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -251,21 +251,21 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       >
         {/* Controller Body */}
         <rect 
-          x="20" 
+          x="40" 
           y="40" 
-          width="580" 
-          height="420" 
-          rx="20" 
+          width="800" 
+          height="560" 
+          rx="30" 
           className="fill-card stroke-border stroke-2"
           filter="drop-shadow(0 0 20px hsl(var(--primary) / 0.1))"
         />
         
         {/* Novation Branding */}
         <text 
-          x="310" 
+          x="440" 
           y="30" 
           textAnchor="middle" 
-          className="fill-primary text-sm font-bold"
+          className="fill-primary text-lg font-bold"
         >
           LAUNCH CONTROL XL3
         </text>
