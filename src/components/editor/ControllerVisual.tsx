@@ -270,10 +270,6 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
 
         {/* Bottom Button Row (CC 45-52) */}
         {bottomButtons.map((button, index) => renderButton(button, index, false))}
-
-        {/* Power LED */}
-        <circle cx="580" cy="60" r="4" className="fill-hardware-led-green animate-pulse" />
-        <text x="580" y="80" textAnchor="middle" className="fill-muted-foreground text-xs">PWR</text>
       </motion.svg>
     </div>
   );
