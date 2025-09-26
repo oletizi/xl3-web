@@ -55,6 +55,10 @@ const Editor = () => {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
+          <Button size="sm" className="bg-secondary text-secondary-foreground shadow-glow-secondary">
+            <Play className="w-4 h-4 mr-2" />
+            Test Mode
+          </Button>
           <Button size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
             <Save className="w-4 h-4 mr-2" />
             Save
@@ -110,33 +114,6 @@ const Editor = () => {
                   rows={3}
                   placeholder="Describe your custom mode..."
                 />
-              </div>
-            </div>
-          </Card>
-          {/* Live Preview */}
-          <Card className="p-6 bg-gradient-surface border-border/50">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-foreground">Live Preview</h3>
-              <Badge variant="outline" className="text-secondary">
-                <Zap className="w-3 h-3 mr-1" />
-                Real-time
-              </Badge>
-            </div>
-            
-            <div className="space-y-4">
-              <Button 
-                className="w-full bg-secondary text-secondary-foreground shadow-glow-secondary"
-                size="lg"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Test Mode
-              </Button>
-              
-              <div className="text-center p-4 rounded-lg bg-muted/50">
-                <Volume2 className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  Connect your device to test controls in real-time
-                </p>
               </div>
             </div>
           </Card>
