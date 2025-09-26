@@ -114,7 +114,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         cx={knob.x} 
         cy={knob.y + 30} 
         r="4" 
-        className={`fill-hardware-${knob.ledColor} transition-opacity duration-300`}
+        className={`fill-${knob.ledColor} transition-opacity duration-300`}
         style={{ 
           opacity: 1,
           filter: selectedControl === knob.id ? 'brightness(1.5) drop-shadow(0 0 6px currentColor)' : 'none'
@@ -206,7 +206,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         width="40" 
         height="6" 
         rx="3"
-        className={`fill-hardware-${button.ledColor} ${
+        className={`fill-${button.ledColor} ${
           selectedControl === button.id ? 'animate-pulse' : ''
         }`}
         style={{ opacity: 1 }}
