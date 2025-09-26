@@ -38,7 +38,7 @@ const Layout = ({ children }: LayoutProps) => {
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Launch Control XL3
+              XL 3
             </h1>
           </Link>
 
@@ -97,7 +97,7 @@ const Layout = ({ children }: LayoutProps) => {
       <footer className="border-t border-border bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <p>Launch Control XL3 Web UI - Professional Mode Editor</p>
+            <p>XL 3 Web UI - Professional Mode Editor</p>
             <div className="flex items-center space-x-4">
               <span>Build with ⚡ by Lovable</span>
               <div className="flex items-center space-x-2">
