@@ -6,21 +6,6 @@ interface ControllerVisualProps {
 }
 
 const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisualProps) => {
-  // Simulate CC values for LED brightness (in real app, these would come from actual device state)
-  const ccValues: { [key: string]: number } = {
-    'knob-cc13': 45, 'knob-cc14': 89, 'knob-cc15': 12, 'knob-cc16': 127,
-    'knob-cc17': 67, 'knob-cc18': 23, 'knob-cc19': 98, 'knob-cc20': 34,
-    'knob-cc53': 76, 'knob-cc22': 55, 'knob-cc23': 99, 'knob-cc24': 15,
-    'knob-cc25': 82, 'knob-cc26': 41, 'knob-cc27': 120, 'knob-cc28': 8,
-    'knob-cc29': 63, 'knob-cc30': 95, 'knob-cc31': 27, 'knob-cc32': 110,
-    'knob-cc33': 48, 'knob-cc34': 77, 'knob-cc35': 19, 'knob-cc36': 101,
-  };
-
-  // Convert CC value (0-127) to LED brightness (0.1-1.0)
-  const getLEDBrightness = (controlId: string): number => {
-    const ccValue = ccValues[controlId] || 0;
-    return 0.1 + (ccValue / 127) * 0.9;
-  };
   // Top row knobs (CC 13-20) with red LEDs
   const topKnobs = [
     { id: "knob-cc13", x: 160, y: 120, cc: 13, ledColor: "led-red" },
@@ -124,14 +109,14 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         style={{ transformOrigin: `${knob.x}px ${knob.y}px` }}
       />
       
-      {/* LED Indicator Below Knob - brightness varies with CC value */}
+      {/* LED Indicator Below Knob - full brightness */}
       <circle 
         cx={knob.x} 
         cy={knob.y + 30} 
         r="4" 
         className={`fill-hardware-${knob.ledColor} transition-opacity duration-300`}
         style={{ 
-          opacity: getLEDBrightness(knob.id),
+          opacity: 1,
           filter: selectedControl === knob.id ? 'brightness(1.5) drop-shadow(0 0 6px currentColor)' : 'none'
         }}
       />
@@ -222,8 +207,9 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         height="6" 
         rx="3"
         className={`fill-hardware-${button.ledColor} ${
-          selectedControl === button.id ? 'animate-pulse' : 'opacity-60'
+          selectedControl === button.id ? 'animate-pulse' : ''
         }`}
+        style={{ opacity: 1 }}
       />
       
       {/* CC Number Label */}
