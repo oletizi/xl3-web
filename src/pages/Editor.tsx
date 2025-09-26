@@ -51,7 +51,7 @@ const Editor = () => {
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
-          <Button variant="secondary" size="sm">
+          <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
