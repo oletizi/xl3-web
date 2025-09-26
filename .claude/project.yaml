@@ -1,0 +1,298 @@
+name: launch-control-xl3-web-ui
+description: Modern web application for creating, managing, and sharing custom modes for Novation Launch Control XL 3
+version: 0.1.0
+type: fullstack-web-application
+
+metadata:
+  created: 2024-09-26
+  team_size: small
+  complexity: high
+  domain: audio-engineering-web-interface
+
+technology_stack:
+  languages:
+    - typescript
+    - javascript
+  frameworks:
+    - next.js
+    - react
+    - node.js
+  frontend:
+    - next.js-14
+    - react-18
+    - tailwind-css
+    - radix-ui
+    - framer-motion
+  backend:
+    - next.js-api-routes
+    - prisma
+    - next-auth
+  database:
+    - postgresql
+    - sqlite-dev
+    - redis
+  build_tools:
+    - pnpm
+    - typescript
+    - turbopack
+  testing:
+    - vitest
+    - playwright
+    - react-testing-library
+  validation:
+    - zod
+  hardware:
+    - webmidi
+    - midi-protocol
+  deployment:
+    - vercel
+    - github-actions
+  monitoring:
+    - sentry
+
+agents:
+  - id: orchestrator
+    role: Workflow Coordinator
+    priority: essential
+
+  - id: fullstack-developer
+    role: Full Stack Web Developer
+    priority: essential
+    focus:
+      - Next.js development
+      - Full-stack architecture
+      - API routes and server components
+      - End-to-end features
+
+  - id: react-specialist
+    role: React & UI Expert
+    priority: essential
+    focus:
+      - React 18+ features
+      - Component architecture
+      - Performance optimization
+      - State management
+
+  - id: typescript-pro
+    role: TypeScript Expert
+    priority: essential
+    focus:
+      - Type safety
+      - Next.js TypeScript patterns
+      - Interface design
+
+  - id: backend-developer
+    role: Backend Specialist
+    priority: high
+    focus:
+      - Next.js API routes
+      - Serverless functions
+      - Database integration
+      - Authentication
+
+  - id: database-administrator
+    role: Database Expert
+    priority: high
+    focus:
+      - PostgreSQL optimization
+      - Prisma ORM
+      - Schema design
+      - Query performance
+
+  - id: ui-designer
+    role: UI/UX Designer
+    priority: high
+    focus:
+      - Visual design
+      - Component design systems
+      - User experience
+      - Responsive design
+
+  - id: embedded-systems
+    role: Hardware Interface Expert
+    priority: high
+    focus:
+      - WebMIDI integration
+      - Hardware controller interaction
+      - Real-time MIDI communication
+      - Browser MIDI API
+
+  - id: devops-engineer
+    role: DevOps & Deployment
+    priority: high
+    focus:
+      - Vercel deployment
+      - CI/CD pipelines
+      - Environment configuration
+      - Monitoring setup
+
+  - id: security-auditor
+    role: Security Specialist
+    priority: high
+    focus:
+      - Authentication security
+      - Data validation
+      - API security
+      - OAuth implementation
+
+  - id: api-designer
+    role: API Design Specialist
+    priority: high
+    focus:
+      - REST API design
+      - Next.js API routes
+      - TypeScript interfaces
+      - Request/response schemas
+
+  - id: architect-reviewer
+    role: Architecture Reviewer
+    priority: high
+    focus:
+      - Next.js architecture
+      - Component boundaries
+      - State management patterns
+      - Scalability
+
+  - id: documentation-engineer
+    role: Documentation Specialist
+    priority: high
+    focus:
+      - User guides
+      - API documentation
+      - Developer documentation
+      - Usage examples
+
+  - id: test-automator
+    role: Testing Specialist
+    priority: high
+    focus:
+      - Unit tests (Vitest)
+      - E2E tests (Playwright)
+      - Component tests
+      - Integration tests
+
+  - id: code-reviewer
+    role: Code Quality Guardian
+    priority: essential
+    focus:
+      - Code reviews
+      - Best practices
+      - Performance
+      - Security patterns
+
+  - id: javascript-pro
+    role: JavaScript Expert
+    priority: medium
+    focus:
+      - Modern ES2023+
+      - Node.js APIs
+      - Performance optimization
+      - Async patterns
+
+workflows:
+  main:
+    trigger: project_start
+    agents: all
+
+  feature_development:
+    trigger: new_feature
+    agents:
+      - orchestrator
+      - fullstack-developer
+      - typescript-pro
+      - test-automator
+      - documentation-engineer
+
+  frontend_component:
+    trigger: ui_component
+    agents:
+      - react-specialist
+      - typescript-pro
+      - ui-designer
+      - test-automator
+      - code-reviewer
+
+  backend_api:
+    trigger: api_development
+    agents:
+      - backend-developer
+      - api-designer
+      - typescript-pro
+      - security-auditor
+      - test-automator
+
+  database_design:
+    trigger: database_schema
+    agents:
+      - database-administrator
+      - backend-developer
+      - architect-reviewer
+      - security-auditor
+
+  mode_editor:
+    trigger: editor_feature
+    agents:
+      - react-specialist
+      - embedded-systems
+      - typescript-pro
+      - ui-designer
+      - test-automator
+
+  webmidi_integration:
+    trigger: hardware_feature
+    agents:
+      - embedded-systems
+      - react-specialist
+      - typescript-pro
+      - test-automator
+      - code-reviewer
+
+  authentication:
+    trigger: auth_feature
+    agents:
+      - backend-developer
+      - security-auditor
+      - typescript-pro
+      - test-automator
+
+  deployment:
+    trigger: deployment_setup
+    agents:
+      - devops-engineer
+      - architect-reviewer
+      - security-auditor
+      - backend-developer
+
+  testing:
+    trigger: test_suite
+    agents:
+      - test-automator
+      - react-specialist
+      - typescript-pro
+      - code-reviewer
+
+  documentation:
+    trigger: docs_update
+    agents:
+      - documentation-engineer
+      - fullstack-developer
+      - api-designer
+
+settings:
+  code_review: enabled
+  auto_testing: enabled
+  documentation_required: true
+  type_checking: strict
+  security_audit: enabled
+  performance_monitoring: enabled
+
+project_specific:
+  web_application: true
+  fullstack_nextjs: true
+  webmidi_integration: true
+  hardware_controller_support: true
+  real_time_midi: true
+  community_features: true
+  user_authentication: true
+  cloud_deployment: true
+  database_required: true
