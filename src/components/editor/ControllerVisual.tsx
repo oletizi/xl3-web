@@ -259,16 +259,6 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
           className="fill-card stroke-border stroke-2"
           filter="drop-shadow(0 0 20px hsl(var(--primary) / 0.1))"
         />
-        
-        {/* Novation Branding */}
-        <text 
-          x="460" 
-          y="50" 
-          textAnchor="middle" 
-          className="fill-primary text-lg font-bold"
-        >
-          LAUNCH CONTROL XL3
-        </text>
 
         {/* Top Row Knobs (CC 13-20) */}
         {topKnobs.map((knob, index) => renderKnob(knob, index))}
