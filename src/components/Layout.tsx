@@ -72,10 +72,14 @@ const Layout = ({ children }: LayoutProps) => {
 
           <div className="flex items-center space-x-2">
             {/* Device Status Indicator */}
-            <div className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-muted/50">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-muted/50 hover:bg-muted/70"
+            >
               <Activity className="w-4 h-4 text-destructive animate-pulse" />
               <span className="text-sm text-muted-foreground">Disconnected</span>
-            </div>
+            </Button>
             
             <Button variant="ghost" size="sm">
               <Settings className="w-4 h-4" />
