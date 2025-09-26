@@ -75,8 +75,9 @@ export default {
           button: "hsl(var(--button))",
           "button-active": "hsl(var(--button-active))",
           "led-red": "hsl(var(--led-red))",
-          "led-green": "hsl(var(--led-green))",
           "led-orange": "hsl(var(--led-orange))",
+          "led-yellow": "hsl(var(--led-yellow))",
+          "led-green": "hsl(var(--led-green))",
         },
       },
       backgroundImage: {

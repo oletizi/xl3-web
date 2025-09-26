@@ -32,14 +32,14 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
 
   // Bottom row knobs (CC 29-36) with yellow LEDs
   const bottomKnobs = [
-    { id: "knob-cc29", x: 160, y: 280, cc: 29, ledColor: "warning" },
-    { id: "knob-cc30", x: 240, y: 280, cc: 30, ledColor: "warning" },
-    { id: "knob-cc31", x: 320, y: 280, cc: 31, ledColor: "warning" },
-    { id: "knob-cc32", x: 400, y: 280, cc: 32, ledColor: "warning" },
-    { id: "knob-cc33", x: 480, y: 280, cc: 33, ledColor: "warning" },
-    { id: "knob-cc34", x: 560, y: 280, cc: 34, ledColor: "warning" },
-    { id: "knob-cc35", x: 640, y: 280, cc: 35, ledColor: "warning" },
-    { id: "knob-cc36", x: 720, y: 280, cc: 36, ledColor: "warning" },
+    { id: "knob-cc29", x: 160, y: 280, cc: 29, ledColor: "led-yellow" },
+    { id: "knob-cc30", x: 240, y: 280, cc: 30, ledColor: "led-yellow" },
+    { id: "knob-cc31", x: 320, y: 280, cc: 31, ledColor: "led-yellow" },
+    { id: "knob-cc32", x: 400, y: 280, cc: 32, ledColor: "led-yellow" },
+    { id: "knob-cc33", x: 480, y: 280, cc: 33, ledColor: "led-yellow" },
+    { id: "knob-cc34", x: 560, y: 280, cc: 34, ledColor: "led-yellow" },
+    { id: "knob-cc35", x: 640, y: 280, cc: 35, ledColor: "led-yellow" },
+    { id: "knob-cc36", x: 720, y: 280, cc: 36, ledColor: "led-yellow" },
   ];
 
   // Vertical faders (CC 5-12)

@@ -61,8 +61,9 @@
     --button: 220 15% 20%;
     --button-active: 150 100% 45%;
     --led-red: 0 100% 55%;
-    --led-green: 120 100% 45%;
     --led-orange: 25 100% 55%;
+    --led-yellow: 60 100% 55%;
+    --led-green: 120 100% 45%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(195 100% 55%), hsl(195 100% 75%));
