@@ -78,15 +78,6 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     { id: "button-cc52", x: 540, y: 440, cc: 52, ledColor: "primary" },
   ];
 
-  // Left side display panels
-  const displayPanels = [
-    { id: "display-1", x: 40, y: 80, width: 60, height: 40 },
-    { id: "display-2", x: 40, y: 140, width: 60, height: 40 },
-    { id: "display-3", x: 40, y: 200, width: 60, height: 40 },
-    { id: "display-4", x: 40, y: 280, width: 60, height: 40 },
-    { id: "display-5", x: 40, y: 340, width: 60, height: 40 },
-  ];
-
   const renderKnob = (knob: any, index: number) => (
     <g key={knob.id}>
       <motion.circle
@@ -261,23 +252,6 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         >
           LAUNCH CONTROL XL3
         </text>
-
-        {/* Left Display Panels */}
-        {displayPanels.map((panel, index) => (
-          <motion.rect
-            key={panel.id}
-            x={panel.x}
-            y={panel.y}
-            width={panel.width}
-            height={panel.height}
-            rx="4"
-            className="fill-background stroke-border stroke-2 cursor-pointer hover:stroke-primary/50 transition-colors"
-            onClick={() => onControlSelect(panel.id)}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-          />
-        ))}
 
         {/* Top Row Knobs (CC 13-20) */}
         {topKnobs.map((knob, index) => renderKnob(knob, index))}
