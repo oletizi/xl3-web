@@ -1,4 +1,4 @@
-# Launch Control XL 3 Web UI - Development Workplan
+# Launch Control XL 3 Web UI - Initial Specification
 
 ## 📋 Project Overview
 
