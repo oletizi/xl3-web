@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
-  Music, 
   Edit3, 
   Library, 
   Globe, 
@@ -21,8 +20,7 @@ const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: "Home", icon: Music },
-    { path: "/editor", label: "Editor", icon: Edit3 },
+    { path: "/", label: "Editor", icon: Edit3 },
     { path: "/library", label: "Library", icon: Library },
     { path: "/catalog", label: "Catalog", icon: Globe },
   ];
