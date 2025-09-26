@@ -44,12 +44,12 @@ const Editor = () => {
 
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            Import
-          </Button>
-          <Button variant="outline" size="sm">
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
+          </Button>
+          <Button variant="outline" size="sm">
+            <Upload className="w-4 h-4 mr-2" />
+            Import
           </Button>
           <Button variant="secondary" size="sm">
             <Download className="w-4 h-4 mr-2" />
