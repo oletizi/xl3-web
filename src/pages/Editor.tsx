@@ -65,43 +65,11 @@ const Editor = () => {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Main Editor Area */}
         <div className="xl:col-span-3 space-y-6">
-          {/* Mode Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="p-6 bg-gradient-surface border-border/50">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="mode-name" className="text-foreground">Mode Name</Label>
-                  <Input 
-                    id="mode-name"
-                    value={modeName}
-                    onChange={(e) => setModeName(e.target.value)}
-                    className="mt-2 bg-background/50"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mode-description" className="text-foreground">Description</Label>
-                  <Textarea 
-                    id="mode-description"
-                    value={modeDescription}
-                    onChange={(e) => setModeDescription(e.target.value)}
-                    className="mt-2 bg-background/50 resize-none"
-                    rows={3}
-                    placeholder="Describe your custom mode..."
-                  />
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
           {/* Controller Visual */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.1 }}
           >
             <Card className="p-8 bg-gradient-surface border-border/50">
               <div className="text-center mb-6">
@@ -120,9 +88,35 @@ const Editor = () => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
           className="space-y-6"
         >
+          {/* Mode Info */}
+          <Card className="p-6 bg-gradient-surface border-border/50">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Mode Settings</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="mode-name" className="text-foreground">Mode Name</Label>
+                <Input 
+                  id="mode-name"
+                  value={modeName}
+                  onChange={(e) => setModeName(e.target.value)}
+                  className="mt-2 bg-background/50"
+                />
+              </div>
+              <div>
+                <Label htmlFor="mode-description" className="text-foreground">Description</Label>
+                <Textarea 
+                  id="mode-description"
+                  value={modeDescription}
+                  onChange={(e) => setModeDescription(e.target.value)}
+                  className="mt-2 bg-background/50 resize-none"
+                  rows={3}
+                  placeholder="Describe your custom mode..."
+                />
+              </div>
+            </div>
+          </Card>
           {/* Live Preview */}
           <Card className="p-6 bg-gradient-surface border-border/50">
             <div className="flex items-center justify-between mb-4">
