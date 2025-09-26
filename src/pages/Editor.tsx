@@ -55,13 +55,13 @@ const Editor = () => {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button size="sm" className="bg-secondary text-secondary-foreground shadow-glow-secondary">
-            <Play className="w-4 h-4 mr-2" />
-            Test Mode
-          </Button>
           <Button size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
             <Save className="w-4 h-4 mr-2" />
             Save
+          </Button>
+          <Button size="sm" className="bg-secondary text-secondary-foreground shadow-glow-secondary">
+            <Play className="w-4 h-4 mr-2" />
+            Test Mode
           </Button>
         </div>
       </motion.div>
