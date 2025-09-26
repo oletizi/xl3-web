@@ -57,7 +57,7 @@ const Editor = () => {
           </Button>
           <Button size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
             <Save className="w-4 h-4 mr-2" />
-            Save Mode
+            Save
           </Button>
         </div>
       </motion.div>
