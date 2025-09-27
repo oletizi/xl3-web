@@ -46,3 +46,9 @@ IMPORTANT: DEFERRED UNTIL AFTER MVP. DO NOT IMPLEMENT
 - [x] The model data structure is reset to default values when the reset button is pressed
 
 **Status**: ✅ IMPLEMENTED (2025-09-26 - verified with Playwright MCP, see WORKPLAN-STATE-PERSISTENCE.md)
+
+## Feature 5: Inline Edit Control Labels
+5.1 Users can edit control label in the device visualization inline
+- [ ] The control label for a control in the device visualization agrees with the control label value in the model data structure and in the control properties editor
+- [ ] When a user double-clicks on the control label for a control in the device visualization, it turns into a text editor
+- [ ] When the user presses return/enter, the control label value in the model data structure is updated with the value of the text editor, and the control label text editor display is swapped with the default label display 
