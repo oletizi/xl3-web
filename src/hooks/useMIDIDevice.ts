@@ -6,6 +6,7 @@ export interface MIDIState {
   isInitialized: boolean;
   devices: MIDIDevice[];
   xl3Device: MIDIDevice | null;
+  isConnected: boolean;
   error: string | null;
 }
 
@@ -15,6 +16,7 @@ export function useMIDIDevice() {
     isInitialized: false,
     devices: [],
     xl3Device: null,
+    isConnected: false,
     error: null,
   });
 
@@ -44,6 +46,7 @@ export function useMIDIDevice() {
             ...prev,
             devices,
             xl3Device,
+            isConnected: xl3Device?.isConnected === true,
           }));
         });
 
