@@ -19,11 +19,41 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ControllerVisual from "@/components/editor/ControllerVisual";
+import { CustomMode } from "@/types/mode";
+import { saveMode, loadMode } from "@/utils/fileStorage";
+import { toast } from "sonner";
 
 const Editor = () => {
-  const [modeName, setModeName] = useState("New Custom Mode");
-  const [modeDescription, setModeDescription] = useState("");
+  const [mode, setMode] = useState<CustomMode>({
+    name: 'New Custom Mode',
+    description: '',
+    version: '1.0.0',
+    controls: {},
+    createdAt: new Date().toISOString(),
+    modifiedAt: new Date().toISOString()
+  });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    try {
+      await saveMode(mode);
+      toast.success('Mode saved successfully!');
+    } catch (error) {
+      toast.error('Failed to save mode');
+      console.error('Save error:', error);
+    }
+  };
+
+  const handleImport = async () => {
+    try {
+      const loadedMode = await loadMode();
+      setMode(loadedMode);
+      toast.success(`Loaded mode: ${loadedMode.name}`);
+    } catch (error) {
+      toast.error('Failed to load mode');
+      console.error('Load error:', error);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -47,7 +77,7 @@ const Editor = () => {
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
           </Button>
-          <Button variant="outline" size="sm">
+          <Button onClick={handleImport} variant="outline" size="sm">
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
@@ -59,7 +89,7 @@ const Editor = () => {
             <Play className="w-4 h-4 mr-2" />
             Send
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
+          <Button onClick={handleSave} size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
             <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
@@ -97,19 +127,19 @@ const Editor = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="mode-name" className="text-foreground">Mode Name</Label>
-                <Input 
+                <Input
                   id="mode-name"
-                  value={modeName}
-                  onChange={(e) => setModeName(e.target.value)}
+                  value={mode.name}
+                  onChange={(e) => setMode({...mode, name: e.target.value})}
                   className="mt-2 bg-background/50"
                 />
               </div>
               <div>
                 <Label htmlFor="mode-description" className="text-foreground">Description</Label>
-                <Textarea 
+                <Textarea
                   id="mode-description"
-                  value={modeDescription}
-                  onChange={(e) => setModeDescription(e.target.value)}
+                  value={mode.description}
+                  onChange={(e) => setMode({...mode, description: e.target.value})}
                   className="mt-2 bg-background/50 resize-none"
                   rows={3}
                   placeholder="Describe your custom mode..."
