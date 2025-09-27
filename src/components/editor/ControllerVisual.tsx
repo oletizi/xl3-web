@@ -78,7 +78,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     { id: "button-cc52", x: 720, y: 580, cc: 52, ledColor: "primary" },
   ];
 
-  const renderKnob = (knob: any, index: number) => (
+  const renderKnob = (knob: { id: string; x: number; y: number; cc: number; ledColor: string }, index: number) => (
     <g key={knob.id}>
       <motion.circle
         cx={knob.x}
@@ -133,7 +133,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     </g>
   );
 
-  const renderFader = (fader: any, index: number) => (
+  const renderFader = (fader: { id: string; x: number; y: number; cc: number }, index: number) => (
     <g key={fader.id}>
       {/* Fader Track */}
       <rect 
@@ -177,7 +177,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     </g>
   );
 
-  const renderButton = (button: any, index: number, isTop: boolean) => (
+  const renderButton = (button: { id: string; x: number; y: number; cc: number; ledColor: string }, index: number, isTop: boolean) => (
     <g key={button.id}>
       {/* Button Body */}
       <motion.rect
