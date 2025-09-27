@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,15 +23,23 @@ import { CustomMode, ControlMapping } from "@/types/mode";
 import { saveMode, loadMode } from "@/utils/fileStorage";
 import { toast } from "sonner";
 import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetadata";
+import { loadModeFromStorage, saveModeToStorage, clearModeFromStorage } from "@/utils/statePersistence";
 
 const Editor = () => {
-  const [mode, setMode] = useState<CustomMode>({
-    name: 'New Custom Mode',
-    description: '',
-    version: '1.0.0',
-    controls: initializeDefaultControls(),
-    createdAt: new Date().toISOString(),
-    modifiedAt: new Date().toISOString()
+  const [mode, setMode] = useState<CustomMode>(() => {
+    const savedMode = loadModeFromStorage();
+    if (savedMode) {
+      return savedMode;
+    }
+
+    return {
+      name: 'New Custom Mode',
+      description: '',
+      version: '1.0.0',
+      controls: initializeDefaultControls(),
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString()
+    };
   });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
 
@@ -75,6 +83,25 @@ const Editor = () => {
     }
   };
 
+  const handleReset = () => {
+    clearModeFromStorage();
+
+    setMode({
+      name: 'New Custom Mode',
+      description: '',
+      version: '1.0.0',
+      controls: initializeDefaultControls(),
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString()
+    });
+
+    toast.success('Mode reset to defaults');
+  };
+
+  useEffect(() => {
+    saveModeToStorage(mode);
+  }, [mode]);
+
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
@@ -93,7 +120,7 @@ const Editor = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
+          <Button onClick={handleReset} variant="outline" size="sm">
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
           </Button>
