@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Launch Control XL 3 Design System - Professional Music Production Interface */
+
+@layer base {
+  :root {
+    /* Core Background & Surface */
+    --background: 220 15% 8%;
+    --foreground: 0 0% 95%;
+
+    /* Card & Surface Elements */
+    --card: 220 15% 10%;
+    --card-foreground: 0 0% 95%;
+
+    /* Popover & Overlay Elements */
+    --popover: 220 15% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Primary Brand - Electric Blue */
+    --primary: 195 100% 55%;
+    --primary-foreground: 220 15% 8%;
+    --primary-glow: 195 100% 75%;
+
+    /* Secondary - Neon Green */
+    --secondary: 150 100% 45%;
+    --secondary-foreground: 220 15% 8%;
+    --secondary-glow: 150 100% 65%;
+
+    /* Accent - Electric Orange */
+    --accent: 25 100% 55%;
+    --accent-foreground: 220 15% 8%;
+    --accent-glow: 25 100% 75%;
+
+    /* Warning - Neon Yellow */
+    --warning: 60 100% 55%;
+    --warning-foreground: 220 15% 8%;
+
+    /* Destructive - Neon Red */
+    --destructive: 0 100% 55%;
+    --destructive-foreground: 0 0% 95%;
+
+    /* Muted Elements */
+    --muted: 220 15% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    /* Interactive Elements */
+    --border: 220 15% 20%;
+    --input: 220 15% 12%;
+    --ring: 195 100% 55%;
+
+    /* Control Panel */
+    --control-panel: 220 15% 6%;
+    --control-active: 195 100% 55%;
+    --control-inactive: 0 0% 25%;
+
+    /* Hardware Colors */
+    --knob: 220 15% 25%;
+    --knob-active: 195 100% 55%;
+    --button: 220 15% 20%;
+    --button-active: 150 100% 45%;
+    --led-red: 0 100% 55%;
+    --led-orange: 25 100% 55%;
+    --led-yellow: 60 100% 55%;
+    --led-green: 120 100% 45%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(195 100% 55%), hsl(195 100% 75%));
+    --gradient-secondary: linear-gradient(135deg, hsl(150 100% 45%), hsl(150 100% 65%));
+    --gradient-accent: linear-gradient(135deg, hsl(25 100% 55%), hsl(25 100% 75%));
+    --gradient-surface: linear-gradient(135deg, hsl(220 15% 10%), hsl(220 15% 12%));
+    --gradient-glow: linear-gradient(135deg, hsl(195 100% 55% / 0.3), hsl(150 100% 45% / 0.3));
+
+    /* Shadows & Glows */
+    --shadow-glow-primary: 0 0 30px hsl(195 100% 55% / 0.5);
+    --shadow-glow-secondary: 0 0 30px hsl(150 100% 45% / 0.5);
+    --shadow-surface: 0 4px 20px hsl(220 15% 5% / 0.5);
+    --shadow-control: inset 0 2px 4px hsl(220 15% 5% / 0.8);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --radius: 0.5rem;
+
+    /* Sidebar (keeping existing for compatibility) */
+    --sidebar-background: 220 15% 6%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 195 100% 55%;
+    --sidebar-primary-foreground: 220 15% 8%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 15% 20%;
+    --sidebar-ring: 195 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
