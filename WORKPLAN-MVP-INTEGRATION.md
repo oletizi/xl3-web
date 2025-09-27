@@ -1,0 +1,535 @@
+# Launch Control XL 3 Web UI - MVP Integration Workplan
+
+## Executive Summary
+
+This workplan defines the integration of functional MVP features into the Vite + React + shadcn/ui stack. The goal is to connect the beautiful UI from lovable with the working hooks and libraries from feat/mvp.
+
+**Branch**: `feat/mvp-integration`
+**Timeline**: 2-3 days
+**Status**: In Progress
+
+## Current State
+
+### ✅ Complete
+- Vite + React + shadcn/ui project structure
+- Beautiful Editor page UI with header, buttons, and layout
+- Animated ControllerVisual component with all hardware controls
+- Property panel UI with tabs for mapping and advanced settings
+- Mode settings UI (name, description)
+- Functional hooks: `useModeBuilder`, `useMIDIDevice`, `useLocalStorage`
+- Type definitions: `Control`, `ControlMapping`, `CustomMode`, `ControlBehaviour`
+- MIDI connection library (`src/lib/midi/connection.ts`)
+- Local storage library (`src/lib/storage/local-storage.ts`)
+
+### 🔧 Needs Integration
+- Connect hooks to Editor page
+- Update ControllerVisual to use Control objects
+- Wire property panel to actual control editing
+- Add MIDI connection status UI
+- Add storage auto-save status UI
+- Implement import/export functionality
+- Connect "Send to Device" button
+
+## Integration Tasks
+
+### Phase 1: Core Hook Integration (Day 1)
+
+#### Task 1.1: Update Editor.tsx with Hooks
+**File**: `src/pages/Editor.tsx`
+
+**Changes**:
+1. Import the three main hooks:
+   ```typescript
+   import { useModeBuilder } from '@/hooks/useModeBuilder';
+   import { useMIDIDevice } from '@/hooks/useMIDIDevice';
+   import { useLocalStorage } from '@/hooks/useLocalStorage';
+   ```
+
+2. Replace simple state with hooks:
+   ```typescript
+   // Replace:
+   const [modeName, setModeName] = useState("New Custom Mode");
+
+   // With:
+   const {
+     mode,
+     isDirty,
+     updateModeName,
+     updateModeDescription,
+     updateControl,
+     getControlMapping,
+     resetMode,
+     exportMode,
+     importMode,
+     markClean,
+   } = useModeBuilder();
+
+   const {
+     isSupported,
+     isInitialized,
+     devices,
+     xl3Device,
+     error: midiError,
+   } = useMIDIDevice();
+   ```
+
+3. Add storage hook with memoized options (CRITICAL - prevents infinite loop):
+   ```typescript
+   const [lastSaved, setLastSaved] = useState<number | null>(null);
+   const [storageSize, setStorageSize] = useState(0);
+
+   const handleLoadSuccess = useCallback((loaded: CustomMode) => {
+     loadMode(loaded);
+   }, [loadMode]);
+
+   const handleSaveSuccess = useCallback(() => {
+     markClean();
+   }, [markClean]);
+
+   const handleSaveError = useCallback((error: Error) => {
+     console.error('Save error:', error);
+   }, []);
+
+   const options = useMemo(() => ({
+     autoSave: true,
+     onLoadSuccess: handleLoadSuccess,
+     onSaveSuccess: handleSaveSuccess,
+     onSaveError: handleSaveError,
+   }), [handleLoadSuccess, handleSaveSuccess, handleSaveError]);
+
+   const { saveToStorage, clearStorage, getSavedAt, getStorageSize } =
+     useLocalStorage(mode, isDirty, options);
+   ```
+
+4. Update storage state when save completes:
+   ```typescript
+   const prevIsDirtyRef = useRef(isDirty);
+
+   useEffect(() => {
+     if (prevIsDirtyRef.current && !isDirty) {
+       setLastSaved(Date.now());
+       setStorageSize(getStorageSize());
+     }
+     prevIsDirtyRef.current = isDirty;
+   }, [isDirty, getStorageSize]);
+   ```
+
+**Success Criteria**:
+- [ ] Editor imports hooks without errors
+- [ ] TypeScript compilation succeeds
+- [ ] No infinite render loops
+- [ ] Mode state managed by useModeBuilder
+- [ ] MIDI device detection working
+- [ ] Auto-save triggers on mode changes
+
+#### Task 1.2: Update ControllerVisual Interface
+**File**: `src/components/editor/ControllerVisual.tsx`
+
+**Changes**:
+1. Update interface to accept Control objects:
+   ```typescript
+   import { Control } from '@/types/controls';
+
+   interface ControllerVisualProps {
+     selectedControl: Control | null;
+     onControlSelect: (control: Control) => void;
+   }
+   ```
+
+2. Define all controls as Control objects:
+   ```typescript
+   const topKnobs: Control[] = [
+     {
+       id: 'knob-1-1',
+       type: 'knob',
+       label: 'SEND A1',
+       ccNumber: 13,
+       channel: 1,
+       x: 160,
+       y: 120,
+     },
+     // ... rest of knobs
+   ];
+   ```
+
+3. Update selection comparison:
+   ```typescript
+   selectedControl?.id === control.id
+   ```
+
+4. Pass Control objects to click handlers:
+   ```typescript
+   onClick={() => onControlSelect(control)}
+   ```
+
+**Success Criteria**:
+- [ ] TypeScript compilation succeeds with Control types
+- [ ] Controls are properly typed objects
+- [ ] Selection works with Control objects
+- [ ] Visual feedback shows selected control
+
+### Phase 2: Property Panel Integration (Day 1-2)
+
+#### Task 2.1: Wire Property Panel to Control Editing
+**File**: `src/pages/Editor.tsx`
+
+**Changes**:
+1. Get current control mapping:
+   ```typescript
+   const currentMapping = selectedControl
+     ? getControlMapping(selectedControl)
+     : null;
+   ```
+
+2. Create handler for property updates:
+   ```typescript
+   const handlePropertyChange = useCallback((
+     field: keyof ControlMapping,
+     value: number | string
+   ) => {
+     if (!selectedControl) return;
+
+     updateControl(selectedControl, {
+       [field]: value,
+     });
+   }, [selectedControl, updateControl]);
+   ```
+
+3. Pass props to property panel inputs:
+   ```typescript
+   <Input
+     id="cc-number"
+     type="number"
+     min="0"
+     max="127"
+     value={currentMapping?.cc ?? selectedControl?.ccNumber ?? 1}
+     onChange={(e) => handlePropertyChange('cc', parseInt(e.target.value))}
+   />
+   ```
+
+4. Update all property panel inputs similarly:
+   - CC Number (0-127)
+   - MIDI Channel (1-16)
+   - Min Value (0-127)
+   - Max Value (0-127)
+   - Control Label (string)
+
+**Success Criteria**:
+- [ ] Property inputs show current mapping values
+- [ ] Changing properties updates mode state
+- [ ] Changes trigger auto-save
+- [ ] isDirty flag updates correctly
+- [ ] TypeScript has no errors
+
+### Phase 3: UI Components (Day 2)
+
+#### Task 3.1: Add MIDI Connection Status Component
+**New File**: `src/components/hardware/MIDIConnection.tsx`
+
+**Features**:
+- Show WebMIDI support status
+- Display connected devices
+- Highlight Launch Control XL3 if detected
+- Show connection errors
+- Use Badge components for status
+
+**Integration**:
+- Add to Editor page header or sidebar
+- Show device name when connected
+- Show "Not Connected" when no device
+- Show error message if WebMIDI not supported
+
+**Success Criteria**:
+- [ ] Component displays MIDI status
+- [ ] Shows Launch Control XL3 when connected
+- [ ] Updates when device connects/disconnects
+- [ ] Error messages are clear
+
+#### Task 3.2: Add Storage Status Component
+**New File**: `src/components/storage/StorageStatus.tsx`
+
+**Features**:
+- Auto-save indicator (green dot when clean, yellow when dirty)
+- Last saved timestamp (human-readable: "5 seconds ago")
+- Storage size display
+- Manual save button
+- Clear storage button (with confirmation)
+
+**Integration**:
+- Add to Editor page, likely near mode settings
+- Update timestamp every 10 seconds
+- Show spinning indicator during save
+
+**Success Criteria**:
+- [ ] Shows "saving..." when isDirty is true
+- [ ] Shows "saved X ago" when clean
+- [ ] Manual save button triggers saveToStorage
+- [ ] Clear button has confirmation dialog
+- [ ] Storage size displays in KB/MB
+
+### Phase 4: Import/Export Functionality (Day 2)
+
+#### Task 4.1: Implement Export Handler
+**File**: `src/pages/Editor.tsx`
+
+**Implementation**:
+```typescript
+const handleExport = useCallback(() => {
+  const json = exportMode();
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${mode.name.replace(/\s+/g, '-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}, [exportMode, mode.name]);
+```
+
+**Wire to Button**:
+```typescript
+<Button variant="outline" size="sm" onClick={handleExport}>
+  <Download className="w-4 h-4 mr-2" />
+  Export
+</Button>
+```
+
+**Success Criteria**:
+- [ ] Export button downloads JSON file
+- [ ] Filename includes mode name
+- [ ] JSON is valid and properly formatted
+- [ ] Exported mode can be manually inspected
+
+#### Task 4.2: Implement Import Handler
+**File**: `src/pages/Editor.tsx`
+
+**Implementation**:
+```typescript
+const handleImport = useCallback(() => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const success = importMode(text);
+
+    if (!success) {
+      alert('Invalid mode file. Please check the format.');
+    }
+  };
+  input.click();
+}, [importMode]);
+```
+
+**Wire to Button**:
+```typescript
+<Button variant="outline" size="sm" onClick={handleImport}>
+  <Upload className="w-4 h-4 mr-2" />
+  Import
+</Button>
+```
+
+**Success Criteria**:
+- [ ] Import button opens file picker
+- [ ] Accepts .json files only
+- [ ] Valid JSON loads mode
+- [ ] Invalid JSON shows error
+- [ ] Imported mode displays in editor
+
+### Phase 5: Device Communication (Day 3)
+
+#### Task 5.1: Implement Send to Device
+**File**: `src/pages/Editor.tsx`
+
+**Implementation**:
+```typescript
+const handleSendToDevice = useCallback(() => {
+  if (!xl3Device) {
+    alert('Launch Control XL3 not connected');
+    return;
+  }
+
+  // TODO: Implement mode sending via MIDI SysEx
+  // This requires understanding XL3's SysEx protocol
+  console.log('Sending mode to device:', mode);
+  alert('Send to Device - Not yet implemented (requires SysEx protocol)');
+}, [xl3Device, mode]);
+```
+
+**Wire to Button**:
+```typescript
+<Button
+  size="sm"
+  className="bg-secondary text-secondary-foreground shadow-glow-secondary"
+  onClick={handleSendToDevice}
+  disabled={!xl3Device}
+>
+  <Play className="w-4 h-4 mr-2" />
+  Send
+</Button>
+```
+
+**Success Criteria**:
+- [ ] Button disabled when no device connected
+- [ ] Button enabled when XL3 detected
+- [ ] Click shows placeholder message
+- [ ] Mode data logged to console for debugging
+
+**Note**: Full SysEx implementation requires XL3 protocol documentation.
+
+#### Task 5.2: Implement Reset Handler
+**File**: `src/pages/Editor.tsx`
+
+**Implementation**:
+```typescript
+const handleReset = useCallback(() => {
+  if (!confirm('Reset to default mode? This will clear all your changes.')) {
+    return;
+  }
+  resetMode();
+  setSelectedControl(null);
+}, [resetMode]);
+```
+
+**Wire to Button**:
+```typescript
+<Button variant="outline" size="sm" onClick={handleReset}>
+  <RotateCcw className="w-4 h-4 mr-2" />
+  Reset
+</Button>
+```
+
+**Success Criteria**:
+- [ ] Shows confirmation dialog
+- [ ] Resets mode to defaults
+- [ ] Clears control selection
+- [ ] Updates all UI components
+
+### Phase 6: Testing & Polish (Day 3)
+
+#### Task 6.1: Manual Testing
+**Test Checklist**:
+- [ ] App loads without errors
+- [ ] Controller visual renders all controls
+- [ ] Click selects control
+- [ ] Property panel shows control details
+- [ ] Editing properties updates mode
+- [ ] Mode name/description editable
+- [ ] Auto-save triggers after 2 seconds
+- [ ] Last saved timestamp updates
+- [ ] Manual save works
+- [ ] Export downloads JSON
+- [ ] Import loads JSON
+- [ ] Reset clears mode with confirmation
+- [ ] MIDI status shows device when connected
+- [ ] MIDI status shows error when not supported
+- [ ] Page refresh loads saved mode
+
+#### Task 6.2: Browser Testing
+**Browsers to Test**:
+- [ ] Chrome (primary - has WebMIDI)
+- [ ] Edge (has WebMIDI)
+- [ ] Firefox (no WebMIDI, but UI should work)
+- [ ] Safari (no WebMIDI, but UI should work)
+
+#### Task 6.3: TypeScript & Lint Check
+**Run Before Commit**:
+```bash
+pnpm run typecheck
+pnpm run lint
+```
+
+**Success Criteria**:
+- [ ] No TypeScript errors
+- [ ] No ESLint errors
+- [ ] No console warnings
+
+## Technical Considerations
+
+### Infinite Loop Prevention (CRITICAL)
+The previous Next.js implementation had an infinite render loop. **Must use**:
+1. `useMemo` for options object passed to useLocalStorage
+2. `useCallback` for all callback functions
+3. `useRef` to track isDirty transitions
+4. Primitive types (number) instead of objects (Date) for lastSaved
+
+### Control ID Mapping
+The ControllerVisual uses CC-based IDs (`knob-cc13`), but useModeBuilder uses semantic names (`SEND_A1`). The hook's `mapControlIdToMode` function handles this translation.
+
+### TypeScript Strict Mode
+All code must compile with strict TypeScript. Use proper types, avoid `any`, handle null cases.
+
+### Performance
+- Animations should be smooth (60fps)
+- No lag when selecting controls
+- Auto-save debounced to 2 seconds
+- Storage operations should be fast (<10ms)
+
+## File Changes Summary
+
+### Modified Files
+- `src/pages/Editor.tsx` - Main integration point
+- `src/components/editor/ControllerVisual.tsx` - Update to Control objects
+
+### New Files
+- `src/components/hardware/MIDIConnection.tsx` - MIDI status UI
+- `src/components/storage/StorageStatus.tsx` - Storage status UI
+
+### No Changes Needed
+- `src/hooks/useModeBuilder.ts` - Already functional
+- `src/hooks/useMIDIDevice.ts` - Already functional
+- `src/hooks/useLocalStorage.ts` - Already functional
+- `src/types/controls.ts` - Already defined
+- `src/types/mode.ts` - Already defined
+- `src/lib/midi/connection.ts` - Already implemented
+- `src/lib/storage/local-storage.ts` - Already implemented
+
+## Success Criteria
+
+### MVP Integration Complete When:
+1. **Functional**:
+   - [x] Hooks integrated into Editor
+   - [ ] ControllerVisual uses Control objects
+   - [ ] Property panel edits control mappings
+   - [ ] MIDI device detection working
+   - [ ] Auto-save persists mode
+   - [ ] Import/export functionality works
+   - [ ] All buttons wired to handlers
+
+2. **Quality**:
+   - [ ] No TypeScript errors
+   - [ ] No infinite render loops
+   - [ ] No console errors
+   - [ ] Smooth animations
+   - [ ] Responsive UI
+
+3. **Testing**:
+   - [ ] Manual testing checklist complete
+   - [ ] Browser testing complete
+   - [ ] TypeScript/lint checks pass
+
+## Known Limitations
+
+1. **Send to Device**: Requires XL3 SysEx protocol documentation
+2. **WebMIDI**: Only Chrome/Edge support
+3. **Single Mode**: MVP focuses on one mode at a time
+4. **No Undo/Redo**: Post-MVP feature
+5. **No Bulk Operations**: Post-MVP feature
+
+## Next Steps After Integration
+
+1. Test with real Launch Control XL3 hardware
+2. Implement SysEx protocol for Send to Device
+3. Add more advanced features (undo/redo, templates, etc.)
+4. Write user documentation
+5. Deploy to production
+
+---
+
+**Status**: Ready to implement
+**Current Phase**: Phase 1 - Core Hook Integration
+**Estimated Completion**: 2-3 days
+**Branch**: feat/mvp-integration
