@@ -6,11 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Play, 
-  Save, 
-  Download, 
-  Upload, 
+import {
+  Play,
+  Save,
+  Download,
+  Upload,
   RotateCcw,
   Settings,
   Sliders,
@@ -24,6 +24,8 @@ import { saveMode, loadMode } from "@/utils/fileStorage";
 import { toast } from "sonner";
 import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetadata";
 import { loadModeFromStorage, saveModeToStorage, clearModeFromStorage } from "@/utils/statePersistence";
+import { useLCXL3Device } from "@/hooks/useLCXL3Device";
+import { lcxl3ModeToCustomMode } from "@/utils/modeConverter";
 
 const Editor = () => {
   const [mode, setMode] = useState<CustomMode>(() => {
@@ -42,6 +44,7 @@ const Editor = () => {
     };
   });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
+  const { isConnected: lcxl3Connected, fetchCurrentMode } = useLCXL3Device();
 
   const selectedControlInfo = selectedControl ? getControlInfo(selectedControl) : null;
   const selectedControlMapping = selectedControl ? mode.controls[selectedControl] : null;
@@ -112,6 +115,32 @@ const Editor = () => {
     }));
   };
 
+  const handleFetch = async () => {
+    try {
+      toast.info('Fetching mode from device...');
+
+      const lcxl3Mode = await fetchCurrentMode();
+      const fetchedMode = lcxl3ModeToCustomMode(lcxl3Mode);
+
+      const defaultControls = initializeDefaultControls();
+      const mergedControls = {
+        ...defaultControls,
+        ...fetchedMode.controls
+      };
+
+      setMode({
+        ...fetchedMode,
+        controls: mergedControls
+      });
+
+      toast.success('Mode fetched successfully from device!');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch mode';
+      toast.error(`Fetch failed: ${message}`);
+      console.error('Fetch error:', error);
+    }
+  };
+
   useEffect(() => {
     saveModeToStorage(mode);
   }, [mode]);
@@ -146,7 +175,20 @@ const Editor = () => {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button size="sm" className="bg-secondary text-secondary-foreground shadow-glow-secondary">
+          <Button
+            onClick={handleFetch}
+            disabled={!lcxl3Connected}
+            size="sm"
+            className="bg-accent text-accent-foreground shadow-glow-accent"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Fetch
+          </Button>
+          <Button
+            disabled={!lcxl3Connected}
+            size="sm"
+            className="bg-secondary text-secondary-foreground shadow-glow-secondary"
+          >
             <Play className="w-4 h-4 mr-2" />
             Send
           </Button>
