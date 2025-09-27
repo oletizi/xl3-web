@@ -49,6 +49,8 @@ IMPORTANT: DEFERRED UNTIL AFTER MVP. DO NOT IMPLEMENT
 
 ## Feature 5: Inline Edit Control Labels
 5.1 Users can edit control label in the device visualization inline
-- [ ] The control label for a control in the device visualization agrees with the control label value in the model data structure and in the control properties editor
-- [ ] When a user double-clicks on the control label for a control in the device visualization, it turns into a text editor
-- [ ] When the user presses return/enter, the control label value in the model data structure is updated with the value of the text editor, and the control label text editor display is swapped with the default label display 
+- [x] The control label for a control in the device visualization agrees with the control label value in the model data structure and in the control properties editor
+- [x] When a user double-clicks on the control label for a control in the device visualization, it turns into a text editor
+- [x] When the user presses return/enter, the control label value in the model data structure is updated with the value of the text editor, and the control label text editor display is swapped with the default label display
+
+**Status**: ✅ IMPLEMENTED (2025-09-27 - verified with Playwright MCP, see WORKPLAN-INLINE-LABEL-EDIT.md) 

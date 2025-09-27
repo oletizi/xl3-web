@@ -1,11 +1,37 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
+import type { ControlMapping } from "@/types/mode";
 
 interface ControllerVisualProps {
   selectedControl: string | null;
   onControlSelect: (controlId: string) => void;
+  controls: Record<string, ControlMapping>;
+  onLabelUpdate: (controlId: string, newLabel: string) => void;
 }
 
-const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisualProps) => {
+const ControllerVisual = ({ selectedControl, onControlSelect, controls, onLabelUpdate }: ControllerVisualProps) => {
+  const [editingControl, setEditingControl] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+
+  const getControlLabel = (controlId: string, defaultLabel: string) => {
+    return controls[controlId]?.label || defaultLabel;
+  };
+
+  const handleLabelDoubleClick = (controlId: string) => {
+    const currentLabel = getControlLabel(controlId, "");
+    setEditingControl(controlId);
+    setEditValue(currentLabel);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, controlId: string) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onLabelUpdate(controlId, editValue);
+      setEditingControl(null);
+    } else if (e.key === 'Escape') {
+      setEditingControl(null);
+    }
+  };
   // Top row knobs (CC 13-20) with red LEDs
   const topKnobs = [
     { id: "knob-cc13", x: 160, y: 120, cc: 13, ledColor: "led-red" },
@@ -132,14 +158,30 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       </text>
       
       {/* Control Label */}
-      <text 
-        x={knob.x} 
-        y={knob.y + 60} 
-        textAnchor="middle" 
-        className="fill-foreground text-xs font-semibold"
-      >
-        Knob {knob.cc}
-      </text>
+      {editingControl === knob.id ? (
+        <foreignObject x={knob.x - 35} y={knob.y + 48} width="70" height="20">
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, knob.id)}
+            onBlur={() => setEditingControl(null)}
+            autoFocus
+            className="w-full text-xs text-center bg-background border border-primary rounded px-1 py-0 h-full"
+            style={{ fontSize: '12px' }}
+          />
+        </foreignObject>
+      ) : (
+        <text
+          x={knob.x}
+          y={knob.y + 60}
+          textAnchor="middle"
+          className="fill-foreground text-xs font-semibold cursor-pointer hover:fill-primary transition-colors"
+          onDoubleClick={() => handleLabelDoubleClick(knob.id)}
+        >
+          {getControlLabel(knob.id, `Knob ${knob.cc}`)}
+        </text>
+      )}
     </g>
   );
 
@@ -186,14 +228,30 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       </text>
       
       {/* Control Label */}
-      <text 
-        x={fader.x} 
-        y={fader.y + 155} 
-        textAnchor="middle" 
-        className="fill-foreground text-xs font-semibold"
-      >
-        Fader {fader.cc}
-      </text>
+      {editingControl === fader.id ? (
+        <foreignObject x={fader.x - 35} y={fader.y + 143} width="70" height="20">
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, fader.id)}
+            onBlur={() => setEditingControl(null)}
+            autoFocus
+            className="w-full text-xs text-center bg-background border border-primary rounded px-1 py-0 h-full"
+            style={{ fontSize: '12px' }}
+          />
+        </foreignObject>
+      ) : (
+        <text
+          x={fader.x}
+          y={fader.y + 155}
+          textAnchor="middle"
+          className="fill-foreground text-xs font-semibold cursor-pointer hover:fill-primary transition-colors"
+          onDoubleClick={() => handleLabelDoubleClick(fader.id)}
+        >
+          {getControlLabel(fader.id, `Fader ${fader.cc}`)}
+        </text>
+      )}
     </g>
   );
 
@@ -243,14 +301,30 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       </text>
       
       {/* Control Label */}
-      <text 
-        x={button.x} 
-        y={button.y + 45} 
-        textAnchor="middle" 
-        className="fill-foreground text-xs font-semibold"
-      >
-        Button {button.cc}
-      </text>
+      {editingControl === button.id ? (
+        <foreignObject x={button.x - 35} y={button.y + 33} width="70" height="20">
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, button.id)}
+            onBlur={() => setEditingControl(null)}
+            autoFocus
+            className="w-full text-xs text-center bg-background border border-primary rounded px-1 py-0 h-full"
+            style={{ fontSize: '12px' }}
+          />
+        </foreignObject>
+      ) : (
+        <text
+          x={button.x}
+          y={button.y + 45}
+          textAnchor="middle"
+          className="fill-foreground text-xs font-semibold cursor-pointer hover:fill-primary transition-colors"
+          onDoubleClick={() => handleLabelDoubleClick(button.id)}
+        >
+          {getControlLabel(button.id, `Button ${button.cc}`)}
+        </text>
+      )}
     </g>
   );
 

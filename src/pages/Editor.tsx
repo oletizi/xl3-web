@@ -98,6 +98,20 @@ const Editor = () => {
     toast.success('Mode reset to defaults');
   };
 
+  const handleLabelUpdate = (controlId: string, newLabel: string) => {
+    setMode(prevMode => ({
+      ...prevMode,
+      controls: {
+        ...prevMode.controls,
+        [controlId]: {
+          ...prevMode.controls[controlId],
+          label: newLabel
+        }
+      },
+      modifiedAt: new Date().toISOString()
+    }));
+  };
+
   useEffect(() => {
     saveModeToStorage(mode);
   }, [mode]);
@@ -153,9 +167,11 @@ const Editor = () => {
             transition={{ delay: 0.1 }}
           >
             <Card className="p-8 bg-gradient-surface border-border/50">
-              <ControllerVisual 
+              <ControllerVisual
                 selectedControl={selectedControl}
                 onControlSelect={setSelectedControl}
+                controls={mode.controls}
+                onLabelUpdate={handleLabelUpdate}
               />
             </Card>
           </motion.div>
