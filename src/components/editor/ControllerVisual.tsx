@@ -44,38 +44,38 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
 
   // Vertical faders (CC 5-12)
   const faders = [
-    { id: "fader-cc5", x: 160, y: 380, cc: 5 },
-    { id: "fader-cc6", x: 240, y: 380, cc: 6 },
-    { id: "fader-cc7", x: 320, y: 380, cc: 7 },
-    { id: "fader-cc8", x: 400, y: 380, cc: 8 },
-    { id: "fader-cc9", x: 480, y: 380, cc: 9 },
-    { id: "fader-cc10", x: 560, y: 380, cc: 10 },
-    { id: "fader-cc11", x: 640, y: 380, cc: 11 },
-    { id: "fader-cc12", x: 720, y: 380, cc: 12 },
+    { id: "fader-cc5", x: 160, y: 420, cc: 5 },
+    { id: "fader-cc6", x: 240, y: 420, cc: 6 },
+    { id: "fader-cc7", x: 320, y: 420, cc: 7 },
+    { id: "fader-cc8", x: 400, y: 420, cc: 8 },
+    { id: "fader-cc9", x: 480, y: 420, cc: 9 },
+    { id: "fader-cc10", x: 560, y: 420, cc: 10 },
+    { id: "fader-cc11", x: 640, y: 420, cc: 11 },
+    { id: "fader-cc12", x: 720, y: 420, cc: 12 },
   ];
 
   // Top button row (CC 37-44) - Green LEDs
   const topButtons = [
-    { id: "button-cc37", x: 160, y: 520, cc: 37, ledColor: "led-green" },
-    { id: "button-cc38", x: 240, y: 520, cc: 38, ledColor: "led-green" },
-    { id: "button-cc39", x: 320, y: 520, cc: 39, ledColor: "led-green" },
-    { id: "button-cc40", x: 400, y: 520, cc: 40, ledColor: "led-green" },
-    { id: "button-cc41", x: 480, y: 520, cc: 41, ledColor: "led-green" },
-    { id: "button-cc42", x: 560, y: 520, cc: 42, ledColor: "led-green" },
-    { id: "button-cc43", x: 640, y: 520, cc: 43, ledColor: "led-green" },
-    { id: "button-cc44", x: 720, y: 520, cc: 44, ledColor: "led-green" },
+    { id: "button-cc37", x: 160, y: 590, cc: 37, ledColor: "led-green" },
+    { id: "button-cc38", x: 240, y: 590, cc: 38, ledColor: "led-green" },
+    { id: "button-cc39", x: 320, y: 590, cc: 39, ledColor: "led-green" },
+    { id: "button-cc40", x: 400, y: 590, cc: 40, ledColor: "led-green" },
+    { id: "button-cc41", x: 480, y: 590, cc: 41, ledColor: "led-green" },
+    { id: "button-cc42", x: 560, y: 590, cc: 42, ledColor: "led-green" },
+    { id: "button-cc43", x: 640, y: 590, cc: 43, ledColor: "led-green" },
+    { id: "button-cc44", x: 720, y: 590, cc: 44, ledColor: "led-green" },
   ];
 
   // Bottom button row (CC 45-52) - Blue LEDs
   const bottomButtons = [
-    { id: "button-cc45", x: 160, y: 580, cc: 45, ledColor: "primary" },
-    { id: "button-cc46", x: 240, y: 580, cc: 46, ledColor: "primary" },
-    { id: "button-cc47", x: 320, y: 580, cc: 47, ledColor: "primary" },
-    { id: "button-cc48", x: 400, y: 580, cc: 48, ledColor: "primary" },
-    { id: "button-cc49", x: 480, y: 580, cc: 49, ledColor: "primary" },
-    { id: "button-cc50", x: 560, y: 580, cc: 50, ledColor: "primary" },
-    { id: "button-cc51", x: 640, y: 580, cc: 51, ledColor: "primary" },
-    { id: "button-cc52", x: 720, y: 580, cc: 52, ledColor: "primary" },
+    { id: "button-cc45", x: 160, y: 650, cc: 45, ledColor: "primary" },
+    { id: "button-cc46", x: 240, y: 650, cc: 46, ledColor: "primary" },
+    { id: "button-cc47", x: 320, y: 650, cc: 47, ledColor: "primary" },
+    { id: "button-cc48", x: 400, y: 650, cc: 48, ledColor: "primary" },
+    { id: "button-cc49", x: 480, y: 650, cc: 49, ledColor: "primary" },
+    { id: "button-cc50", x: 560, y: 650, cc: 50, ledColor: "primary" },
+    { id: "button-cc51", x: 640, y: 650, cc: 51, ledColor: "primary" },
+    { id: "button-cc52", x: 720, y: 650, cc: 52, ledColor: "primary" },
   ];
 
   const renderKnob = (knob: { id: string; x: number; y: number; cc: number; ledColor: string }, index: number) => (
@@ -124,7 +124,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       {/* CC Number Label */}
       <text 
         x={knob.x} 
-        y={knob.y + 50} 
+        y={knob.y + 45} 
         textAnchor="middle" 
         className="fill-muted-foreground text-xs font-medium"
       >
@@ -134,7 +134,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       {/* Control Label */}
       <text 
         x={knob.x} 
-        y={knob.y + 65} 
+        y={knob.y + 60} 
         textAnchor="middle" 
         className="fill-foreground text-xs font-semibold"
       >
@@ -258,8 +258,8 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
     <div className="flex justify-center">
       <motion.svg 
         width="920" 
-        height="680" 
-        viewBox="0 0 920 680"
+        height="780" 
+        viewBox="0 0 920 780"
         className="max-w-full h-auto"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -270,7 +270,7 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
           x="60" 
           y="60" 
           width="800" 
-          height="560" 
+          height="660" 
           rx="30" 
           className="fill-card stroke-border stroke-2"
           filter="drop-shadow(0 0 20px hsl(var(--primary) / 0.1))"
