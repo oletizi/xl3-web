@@ -5,8 +5,8 @@ import { AlertCircle, CheckCircle, XCircle, Usb } from 'lucide-react';
 interface MIDIConnectionProps {
   isSupported: boolean;
   isInitialized: boolean;
-  devices: WebMidi.MIDIInput[];
-  xl3Device: WebMidi.MIDIInput | null;
+  devices: any[];
+  xl3Device: any | null;
   error: string | null;
 }
 

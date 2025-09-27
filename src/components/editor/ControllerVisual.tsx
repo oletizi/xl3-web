@@ -130,6 +130,16 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
       >
         CC {knob.cc}
       </text>
+      
+      {/* Control Label */}
+      <text 
+        x={knob.x} 
+        y={knob.y + 65} 
+        textAnchor="middle" 
+        className="fill-foreground text-xs font-semibold"
+      >
+        Knob {knob.cc}
+      </text>
     </g>
   );
 
@@ -173,6 +183,16 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         className="fill-muted-foreground text-xs font-medium"
       >
         CC {fader.cc}
+      </text>
+      
+      {/* Control Label */}
+      <text 
+        x={fader.x} 
+        y={fader.y + 155} 
+        textAnchor="middle" 
+        className="fill-foreground text-xs font-semibold"
+      >
+        Fader {fader.cc}
       </text>
     </g>
   );
@@ -220,6 +240,16 @@ const ControllerVisual = ({ selectedControl, onControlSelect }: ControllerVisual
         className="fill-muted-foreground text-xs font-medium"
       >
         CC {button.cc}
+      </text>
+      
+      {/* Control Label */}
+      <text 
+        x={button.x} 
+        y={button.y + 45} 
+        textAnchor="middle" 
+        className="fill-foreground text-xs font-semibold"
+      >
+        Button {button.cc}
       </text>
     </g>
   );
