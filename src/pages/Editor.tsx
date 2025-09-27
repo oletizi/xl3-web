@@ -19,20 +19,40 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ControllerVisual from "@/components/editor/ControllerVisual";
-import { CustomMode } from "@/types/mode";
+import { CustomMode, ControlMapping } from "@/types/mode";
 import { saveMode, loadMode } from "@/utils/fileStorage";
 import { toast } from "sonner";
+import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetadata";
 
 const Editor = () => {
   const [mode, setMode] = useState<CustomMode>({
     name: 'New Custom Mode',
     description: '',
     version: '1.0.0',
-    controls: {},
+    controls: initializeDefaultControls(),
     createdAt: new Date().toISOString(),
     modifiedAt: new Date().toISOString()
   });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
+
+  const selectedControlInfo = selectedControl ? getControlInfo(selectedControl) : null;
+  const selectedControlMapping = selectedControl ? mode.controls[selectedControl] : null;
+
+  const updateControlProperty = (field: keyof ControlMapping, value: any) => {
+    if (!selectedControl) return;
+
+    setMode(prevMode => ({
+      ...prevMode,
+      controls: {
+        ...prevMode.controls,
+        [selectedControl]: {
+          ...prevMode.controls[selectedControl],
+          [field]: value
+        }
+      },
+      modifiedAt: new Date().toISOString()
+    }));
+  };
 
   const handleSave = async () => {
     try {
@@ -163,30 +183,32 @@ const Editor = () => {
                   <div>
                     <Label className="text-foreground">Control Type</Label>
                     <Badge variant="secondary" className="ml-2">
-                      {selectedControl}
+                      CC {selectedControlInfo?.cc}
                     </Badge>
                   </div>
                   
                   <div>
                     <Label htmlFor="cc-number" className="text-foreground">CC Number</Label>
-                    <Input 
+                    <Input
                       id="cc-number"
-                      type="number" 
-                      min="0" 
-                      max="127" 
-                      defaultValue="1"
+                      type="number"
+                      min="0"
+                      max="127"
+                      value={selectedControlMapping?.ccNumber || 0}
+                      onChange={(e) => updateControlProperty('ccNumber', parseInt(e.target.value))}
                       className="mt-2 bg-background/50"
                     />
                   </div>
                   
                   <div>
                     <Label htmlFor="midi-channel" className="text-foreground">MIDI Channel</Label>
-                    <Input 
+                    <Input
                       id="midi-channel"
-                      type="number" 
-                      min="1" 
-                      max="16" 
-                      defaultValue="1"
+                      type="number"
+                      min="1"
+                      max="16"
+                      value={selectedControlMapping?.midiChannel || 1}
+                      onChange={(e) => updateControlProperty('midiChannel', parseInt(e.target.value))}
                       className="mt-2 bg-background/50"
                     />
                   </div>
@@ -194,23 +216,25 @@ const Editor = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label htmlFor="min-val" className="text-foreground">Min Value</Label>
-                      <Input 
+                      <Input
                         id="min-val"
-                        type="number" 
-                        min="0" 
-                        max="127" 
-                        defaultValue="0"
+                        type="number"
+                        min="0"
+                        max="127"
+                        value={selectedControlMapping?.minValue || 0}
+                        onChange={(e) => updateControlProperty('minValue', parseInt(e.target.value))}
                         className="mt-2 bg-background/50"
                       />
                     </div>
                     <div>
                       <Label htmlFor="max-val" className="text-foreground">Max Value</Label>
-                      <Input 
+                      <Input
                         id="max-val"
-                        type="number" 
-                        min="0" 
-                        max="127" 
-                        defaultValue="127"
+                        type="number"
+                        min="0"
+                        max="127"
+                        value={selectedControlMapping?.maxValue || 127}
+                        onChange={(e) => updateControlProperty('maxValue', parseInt(e.target.value))}
                         className="mt-2 bg-background/50"
                       />
                     </div>
@@ -220,9 +244,11 @@ const Editor = () => {
                 <TabsContent value="advanced" className="space-y-4">
                   <div>
                     <Label htmlFor="control-name" className="text-foreground">Control Label</Label>
-                    <Input 
+                    <Input
                       id="control-name"
                       placeholder="Custom name..."
+                      value={selectedControlMapping?.label || ''}
+                      onChange={(e) => updateControlProperty('label', e.target.value)}
                       className="mt-2 bg-background/50"
                     />
                   </div>

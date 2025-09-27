@@ -31,9 +31,16 @@ IMPORTANT: DEFERRED UNTIL AFTER MVP. DO NOT IMPLEMENT
 
 **Status**: UNIMPLEMENTED, DEFERRED
 
-## Feature 3: Control Properites
+## Feature 3: Control Properties
 3.1 Users can set properties on the device controls
-- [ ] The user can click on a control and the corresponding control properties editor loads
-- [ ] The control CC number in the properties editor matches the control label in the visual display
-- [ ] The property values in the properties editor are updated to match the model data structure in memory 
-- [ ] When the user changes control properties in the editor, the model data structure in memory is updated accordingly 
+- [x] 3.1.1 The user can click on a control and the corresponding control properties editor loads
+- [x] 3.1.2 The control CC number in the properties editor matches the control label in the visual display
+- [x] 3.1.3 The property values in the properties editor are updated to match the model data structure in memory
+- [x] 3.1.4 When the user changes control properties in the editor, the model data structure in memory is updated accordingly
+
+**Status**: ✅ IMPLEMENTED (2025-09-26 - verified with Playwright MCP, see WORKPLAN-CONTROL-PROPERTIES.md) 
+
+## Feature 4: State Persistence
+4.1 Users can reload/return to the editor and it will remember their state
+- [ ] The model data structure is persistent such that changes made to it in the editor are available when the user returns to the editor
+- [ ] The model data structure is reset to default values when the reset button is pressed
