@@ -20,13 +20,20 @@ Device info:
 **Status**: ✅ IMPLEMENTED (2025-09-26 - verified with hardware, see WORKPLAN-DEVICE-AUTOCONNECT.md)
 
 ## Feature 2: Custom Mode Local Storage
-
+IMPORTANT: DEFERRED UNTIL AFTER MVP. DO NOT IMPLEMENT
 2.1 Users can save the current mode to local file storage.
-- [x] When the user clicks on the Save button, the system offers to save it to the local filesystem
+- [ ] When the user clicks on the Save button, the system offers to save it to the local filesystem
 
 2.2 Users can load stored mode from the local filesystem into the active editor buffer
-- [x] When the user clicks on the Import button, the system offers to load a mode file from the local filesystem
-- [x] When the user selects a mode file, the system loads the mode data from the file into the active editor buffer.
-- [x] The UI elements are updated with the new mode data accordingly
+- [ ] When the user clicks on the Import button, the system offers to load a mode file from the local filesystem
+- [ ] When the user selects a mode file, the system loads the mode data from the file into the active editor buffer.
+- [ ] The UI elements are updated with the new mode data accordingly
 
-**Status**: ✅ IMPLEMENTED (2025-09-26 - verified with Playwright MCP, see WORKPLAN-CUSTOM-MODE-STORAGE.md)
+**Status**: UNIMPLEMENTED, DEFERRED
+
+## Feature 3: Control Properites
+3.1 Users can set properties on the device controls
+- [ ] The user can click on a control and the corresponding control properties editor loads
+- [ ] The control CC number in the properties editor matches the control label in the visual display
+- [ ] The property values in the properties editor are updated to match the model data structure in memory 
+- [ ] When the user changes control properties in the editor, the model data structure in memory is updated accordingly 

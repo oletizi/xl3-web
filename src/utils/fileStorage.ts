@@ -62,9 +62,9 @@ export async function saveMode(mode: any): Promise<void> {
       await writable.close();
       return;
     } catch (error) {
-      // User cancelled or API failed, fall through to fallback
+      // User cancelled or API failed
       if (error instanceof Error && error.name === 'AbortError') {
-        return; // User cancelled
+        throw new Error('File save cancelled');
       }
       console.warn('File System Access API failed, using fallback:', error);
     }
