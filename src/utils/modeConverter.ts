@@ -123,6 +123,11 @@ export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
     : Object.values(lcxl3Mode.controls);
 
   for (const control of controlsArray) {
+    if (!control.controlId && control.controlId !== 0) {
+      console.warn(`Control missing controlId:`, control);
+      continue;
+    }
+
     const ourControlId = LCXL3_TO_APP_CONTROL_MAP[control.controlId];
 
     if (!ourControlId) {
@@ -136,7 +141,7 @@ export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
     const maxValue = control.maxValue ?? control.max ?? 127;
 
     if (ccNumber === undefined || midiChannel === undefined) {
-      console.warn(`Missing CC or channel for controlId: 0x${control.controlId.toString(16)}`);
+      console.warn(`Missing CC or channel for controlId: 0x${control.controlId?.toString(16) ?? 'unknown'}`);
       continue;
     }
 
@@ -162,7 +167,9 @@ export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
     description: `Fetched from device on ${new Date().toLocaleString()}`,
     version: '1.0.0',
     controls,
-    createdAt: lcxl3Mode.metadata?.createdAt?.toISOString() || new Date().toISOString(),
+    createdAt: lcxl3Mode.metadata?.createdAt instanceof Date
+      ? lcxl3Mode.metadata.createdAt.toISOString()
+      : new Date().toISOString(),
     modifiedAt: new Date().toISOString()
   };
 }

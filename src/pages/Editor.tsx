@@ -24,7 +24,7 @@ import { saveMode, loadMode } from "@/utils/fileStorage";
 import { toast } from "sonner";
 import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetadata";
 import { loadModeFromStorage, saveModeToStorage, clearModeFromStorage } from "@/utils/statePersistence";
-import { useLCXL3Device } from "@/hooks/useLCXL3Device";
+import { useLCXL3Device } from "@/contexts/LCXL3Context";
 import { lcxl3ModeToCustomMode } from "@/utils/modeConverter";
 
 const Editor = () => {

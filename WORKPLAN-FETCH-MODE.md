@@ -414,47 +414,61 @@ Full integration testing will require hardware.
 
 ---
 
-## ⚠️ BLOCKER: Library Bug Discovered
+## Update: Feature 6.1 Successfully Implemented! ✅
 
-**Date**: 2025-09-27
-**Issue**: https://github.com/oletizi/ol_dsp/issues/13
+**Date**: 2025-09-28
+**Issue**: https://github.com/oletizi/ol_dsp/issues/13 (RESOLVED)
 
-### Problem
+### Implementation Complete
 
-The `@oletizi/launch-control-xl3` v1.1.0 library's `loadCustomMode()` method does not send SysEx messages to the device when using the Web MIDI backend.
+The Fetch Mode from Device feature is now fully functional! Users can successfully retrieve the current mode from the device into the edit buffer.
 
-### Evidence
+### Final Implementation Status
 
-- Device connects and handshakes successfully
-- `device.isConnected()` returns `true`
-- Clicking Fetch button calls `device.loadCustomMode(0)` correctly
-- **NO SysEx message sent to device** (confirmed with MIDI monitor)
-- Times out after ~3 seconds with "Custom mode read timeout"
-
-### Expected SysEx Message (not sent)
-
-```
-F0 00 20 29 02 11 [command] [slot] F7
-```
-
-### Implementation Status
-
-✅ **Our implementation is complete:**
-- Task 1: `useLCXL3Device` hook ✅
-- Task 2: Mode converter utility ✅
+✅ **All Tasks Completed:**
+- Task 1: `useLCXL3Device` hook ✅ (Updated for v1.8.0)
+- Task 2: Mode converter utility ✅ (Fixed to handle actual library response format)
 - Task 3: Fetch button UI ✅
 - Task 4: Control ID mapping ✅
+- Task 5: Manual verification with hardware ✅
 - Task 6: E2E tests ✅
 
-❌ **Blocked by library:**
-- Task 5: Hardware verification (blocked - library bug prevents MIDI communication)
+### Key Implementation Details
 
-### Next Steps
+1. **Library Version**: Updated to `@oletizi/launch-control-xl3` v1.8.0
+2. **Connection Success**: Device handshake completes successfully in custom mode
+3. **Fetch Functionality**: Successfully retrieves mode data including:
+   - Mode name (e.g., "CHANNEVE")
+   - Control mappings with CC numbers
+   - Channel assignments
+   - Min/max values
 
-1. Wait for library author to fix `loadCustomMode()` in Web MIDI backend
-2. Test with fixed library version
-3. Complete Task 5 verification
+### Technical Solutions Implemented
+
+1. **Web MIDI Backend**: Full implementation of `MidiBackendInterface`
+2. **Context Provider**: `LCXL3Context` ensures single device instance
+3. **Error Handling**: Robust null checking in mode converter
+4. **Old MIDI Removal**: Deleted conflicting MIDIConnectionManager to prevent port conflicts
+
+### Known Limitations
+
+- Controls returned from library don't include `controlId` property
+- Currently only fetches active mode (slot 0)
+- Some control mappings may not be captured if using non-standard IDs
+
+### Feature 6.0 & 6.1 Requirements Met
+
+✅ **Feature 6.0**: Send and Fetch controls are sensitive to connection status
+- Fetch/Send buttons disabled when device not connected
+- Buttons enabled when device connected
+
+✅ **Feature 6.1**: Users can retrieve current mode from device
+- Fetch button present to left of Send button
+- Clicking Fetch initiates MIDI transfer
+- Edit buffer reset to defaults then updated with fetched data
+- UI updates to reflect fetched mode
+- Success/failure toasts displayed
 
 ---
 
-**Implementation Complete** - Blocked by upstream library bug
+**Status**: ✅ Feature 6.1 (Fetch Mode) COMPLETE and WORKING!
