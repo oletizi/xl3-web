@@ -107,68 +107,69 @@ const CC_TO_CONTROL_MAP: Record<string, string> = {
 };
 
 /**
- * Legacy mapping for controlId-based format (kept for compatibility)
+ * Correct mapping for LCXL3 library v1.9.0+
+ * Maps library control IDs to our internal control IDs
  */
 const LCXL3_TO_APP_CONTROL_MAP: Record<number, string> = {
-  // Send A knobs (top row) - CC 13-20 (8 knobs)
-  0x0D: 'knob-cc13',
-  0x0E: 'knob-cc14',
-  0x0F: 'knob-cc15',
-  0x10: 'knob-cc16',
-  0x11: 'knob-cc17',
-  0x12: 'knob-cc18',
-  0x13: 'knob-cc19',
-  0x14: 'knob-cc20',
+  // Send A knobs (top row) - CC 13-20 - FIXED IDs 0x10-0x17
+  0x10: 'knob-cc13',
+  0x11: 'knob-cc14',
+  0x12: 'knob-cc15',
+  0x13: 'knob-cc16',
+  0x14: 'knob-cc17',
+  0x15: 'knob-cc18',
+  0x16: 'knob-cc19',
+  0x17: 'knob-cc20',
 
-  // Send B knobs (middle row) - CC 29-36 (8 knobs)
-  0x1D: 'knob-cc29',
-  0x1E: 'knob-cc30',
-  0x1F: 'knob-cc31',
-  0x20: 'knob-cc32',
-  0x21: 'knob-cc33',
-  0x22: 'knob-cc34',
-  0x23: 'knob-cc35',
-  0x24: 'knob-cc36',
+  // Send B knobs (middle row) - CC 29-36 - FIXED IDs 0x18-0x1F
+  0x18: 'knob-cc29',
+  0x19: 'knob-cc30',
+  0x1A: 'knob-cc31',
+  0x1B: 'knob-cc32',
+  0x1C: 'knob-cc33',
+  0x1D: 'knob-cc34',
+  0x1E: 'knob-cc35',
+  0x1F: 'knob-cc36',
 
-  // Pan/Device knobs (bottom row) - CC 22-28, 53 (8 knobs)
-  0x31: 'knob-cc22',
-  0x32: 'knob-cc23',
-  0x33: 'knob-cc24',
-  0x34: 'knob-cc25',
-  0x35: 'knob-cc26',
-  0x36: 'knob-cc27',
-  0x37: 'knob-cc28',
-  0x38: 'knob-cc53',
+  // Pan/Device knobs (bottom row) - CC 22-28, 53 - FIXED IDs 0x20-0x27
+  0x20: 'knob-cc22',
+  0x21: 'knob-cc23',
+  0x22: 'knob-cc24',
+  0x23: 'knob-cc25',
+  0x24: 'knob-cc26',
+  0x25: 'knob-cc27',
+  0x26: 'knob-cc28',
+  0x27: 'knob-cc53',
 
-  // Faders - CC 5-12 (8 faders)
-  0x4D: 'fader-cc5',
-  0x4E: 'fader-cc6',
-  0x4F: 'fader-cc7',
-  0x50: 'fader-cc8',
-  0x51: 'fader-cc9',
-  0x52: 'fader-cc10',
-  0x53: 'fader-cc11',
-  0x54: 'fader-cc12',
+  // Faders - CC 5-12 - FIXED IDs 0x28-0x2F
+  0x28: 'fader-cc5',
+  0x29: 'fader-cc6',
+  0x2A: 'fader-cc7',
+  0x2B: 'fader-cc8',
+  0x2C: 'fader-cc9',
+  0x2D: 'fader-cc10',
+  0x2E: 'fader-cc11',
+  0x2F: 'fader-cc12',
 
-  // Track focus buttons - CC 41-48 (8 buttons)
-  0x29: 'button-cc41',
-  0x2A: 'button-cc42',
-  0x2B: 'button-cc43',
-  0x2C: 'button-cc44',
-  0x2D: 'button-cc45',
-  0x2E: 'button-cc46',
-  0x2F: 'button-cc47',
-  0x30: 'button-cc48',
+  // Track focus buttons - CC 41-48 - FIXED IDs 0x30-0x37
+  0x30: 'button-cc41',
+  0x31: 'button-cc42',
+  0x32: 'button-cc43',
+  0x33: 'button-cc44',
+  0x34: 'button-cc45',
+  0x35: 'button-cc46',
+  0x36: 'button-cc47',
+  0x37: 'button-cc48',
 
-  // Track control buttons - CC 37-40, 49-52 (8 buttons)
-  0x39: 'button-cc37',
-  0x3A: 'button-cc38',
-  0x3B: 'button-cc39',
-  0x3C: 'button-cc40',
-  0x3D: 'button-cc49',
-  0x3E: 'button-cc50',
-  0x3F: 'button-cc51',
-  0x40: 'button-cc52'
+  // Track control buttons - CC 37-40, 49-52 - FIXED IDs 0x38-0x3F
+  0x38: 'button-cc37',
+  0x39: 'button-cc38',
+  0x3A: 'button-cc39',
+  0x3B: 'button-cc40',
+  0x3C: 'button-cc49',
+  0x3D: 'button-cc50',
+  0x3E: 'button-cc51',
+  0x3F: 'button-cc52'
 };
 
 export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
@@ -256,8 +257,74 @@ const APP_TO_LCXL3_CONTROL_MAP: Record<string, number> = Object.fromEntries(
 );
 
 /**
+ * Mapping from our control IDs to library's named constants
+ * Based on CONTROL_IDS in @oletizi/launch-control-xl3 v1.9.0
+ */
+const APP_TO_LCXL3_CONTROL_NAMES: Record<string, string> = {
+  // Send A knobs - map to SEND_A1-SEND_A8
+  'knob-cc13': 'SEND_A1',
+  'knob-cc14': 'SEND_A2',
+  'knob-cc15': 'SEND_A3',
+  'knob-cc16': 'SEND_A4',
+  'knob-cc17': 'SEND_A5',
+  'knob-cc18': 'SEND_A6',
+  'knob-cc19': 'SEND_A7',
+  'knob-cc20': 'SEND_A8',
+
+  // Send B knobs - map to SEND_B1-SEND_B8
+  'knob-cc29': 'SEND_B1',
+  'knob-cc30': 'SEND_B2',
+  'knob-cc31': 'SEND_B3',
+  'knob-cc32': 'SEND_B4',
+  'knob-cc33': 'SEND_B5',
+  'knob-cc34': 'SEND_B6',
+  'knob-cc35': 'SEND_B7',
+  'knob-cc36': 'SEND_B8',
+
+  // Pan/Device knobs - map to PAN1-PAN8
+  'knob-cc22': 'PAN1',
+  'knob-cc23': 'PAN2',
+  'knob-cc24': 'PAN3',
+  'knob-cc25': 'PAN4',
+  'knob-cc26': 'PAN5',
+  'knob-cc27': 'PAN6',
+  'knob-cc28': 'PAN7',
+  'knob-cc53': 'PAN8',
+
+  // Faders - map to FADER1-FADER8
+  'fader-cc5': 'FADER1',
+  'fader-cc6': 'FADER2',
+  'fader-cc7': 'FADER3',
+  'fader-cc8': 'FADER4',
+  'fader-cc9': 'FADER5',
+  'fader-cc10': 'FADER6',
+  'fader-cc11': 'FADER7',
+  'fader-cc12': 'FADER8',
+
+  // Focus buttons - map to FOCUS1-FOCUS8
+  'button-cc41': 'FOCUS1',
+  'button-cc42': 'FOCUS2',
+  'button-cc43': 'FOCUS3',
+  'button-cc44': 'FOCUS4',
+  'button-cc45': 'FOCUS5',
+  'button-cc46': 'FOCUS6',
+  'button-cc47': 'FOCUS7',
+  'button-cc48': 'FOCUS8',
+
+  // Control buttons - map to CONTROL1-CONTROL8
+  'button-cc37': 'CONTROL1',
+  'button-cc38': 'CONTROL2',
+  'button-cc39': 'CONTROL3',
+  'button-cc40': 'CONTROL4',
+  'button-cc49': 'CONTROL5',
+  'button-cc50': 'CONTROL6',
+  'button-cc51': 'CONTROL7',
+  'button-cc52': 'CONTROL8',
+};
+
+/**
  * Convert our CustomMode format to LCXL3 mode format
- * This function may be useful for sending modes to the device in the future
+ * Uses library's named constants (SEND_A1, FADER1, etc.) as required by v1.9.0+
  */
 export function customModeToLCXL3Mode(customMode: CustomMode): LCXL3CustomMode {
   const controls: Record<string, LCXL3Control> = {};
@@ -265,27 +332,26 @@ export function customModeToLCXL3Mode(customMode: CustomMode): LCXL3CustomMode {
 
   // Process each control mapping from our custom mode
   for (const [ourControlId, control] of Object.entries(customMode.controls)) {
-    const lcxl3ControlId = APP_TO_LCXL3_CONTROL_MAP[ourControlId];
-    if (!lcxl3ControlId) {
-      console.warn(`No LCXL3 mapping found for control ID: ${ourControlId}`);
+    const controlName = APP_TO_LCXL3_CONTROL_NAMES[ourControlId];
+    if (!controlName) {
+      console.warn(`No LCXL3 control name found for: ${ourControlId}`);
       continue;
     }
 
-    const controlKey = `control_${lcxl3ControlId.toString(16).padStart(2, '0').toUpperCase()}`;
-
-    controls[controlKey] = {
-      controlId: lcxl3ControlId,
+    // Use library's expected format with named keys and specific field names
+    controls[controlName] = {
+      controlId: APP_TO_LCXL3_CONTROL_MAP[ourControlId],
       type: control.type,
-      midiChannel: control.midiChannel,
-      ccNumber: control.ccNumber,
-      minValue: control.minValue,
-      maxValue: control.maxValue,
-      behavior: 'absolute'
+      channel: control.midiChannel,      // Library uses 'channel' not 'midiChannel'
+      cc: control.ccNumber,               // Library uses 'cc' not 'ccNumber'
+      min: control.minValue,              // Library uses 'min' not 'minValue'
+      max: control.maxValue,              // Library uses 'max' not 'maxValue'
+      behaviour: 'absolute'               // Library uses 'behaviour' not 'behavior'
     };
 
     // Add label to labels map if provided
     if (control.label) {
-      labels.set(lcxl3ControlId, control.label);
+      labels.set(APP_TO_LCXL3_CONTROL_MAP[ourControlId], control.label);
     }
   }
 

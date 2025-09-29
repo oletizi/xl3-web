@@ -57,15 +57,19 @@ IMPORTANT: DEFERRED UNTIL AFTER MVP. DO NOT IMPLEMENT
 
 ## Feature 6: Send and Receive Modes to and from Device
 6.0 Send and Fetch controls are sensitive to the connection status of the device
-- [ ] When the device is not attached, the Send and fetch buttons are inactive
+- [x] When the device is not attached, the Send and fetch buttons are inactive
 
-- 6.1 Users can retrieve the current mode from the device into the edit buffer
-- [ ] There is a button to the left of the "Send" button labeled "Fetch"
-- [ ] When the user clicks the "Fetch" button, the system initiates a MIDI transfer of the data in the currently active mode in the device
-- [ ] The system resets the current edit buffer to factory defaults, then applies the fetched mode data to the current edit buffer
-- [ ] Per standard operation, the UI is updated to reflect the new state of the edit buffer
-- [ ] The UI indicates the success or failure of the fetch action
+6.1 Users can retrieve the current mode from the device into the edit buffer
+- [x] There is a button to the left of the "Send" button labeled "Fetch"
+- [x] When the user clicks the "Fetch" button, the system initiates a MIDI transfer of the data in the currently active mode in the device
+- [x] The system resets the current edit buffer to factory defaults, then applies the fetched mode data to the current edit buffer
+- [x] Per standard operation, the UI is updated to reflect the new state of the edit buffer
+- [x] The UI indicates the success or failure of the fetch action
 
 6.2 Users can send the current edit buffer to the device as a custom mode
-- [ ] When the user click ons the "Send" button, the system initiates a MIDI transfer of the data in the current edit buffer to the device
-- [ ] The UI indicates the success or failure of the send action
+- [x] When the user clicks the "Send" button, the system initiates a MIDI transfer of the data in the current edit buffer to the device
+- [x] The UI indicates the success or failure of the send action
+
+**Status**: ✅ IMPLEMENTED (2025-09-29)
+
+## Feature 7: Device Slot Support

@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetadata";
 import { loadModeFromStorage, saveModeToStorage, clearModeFromStorage } from "@/utils/statePersistence";
 import { useLCXL3Device } from "@/contexts/LCXL3Context";
-import { lcxl3ModeToCustomMode } from "@/utils/modeConverter";
+import { lcxl3ModeToCustomMode, customModeToLCXL3Mode } from "@/utils/modeConverter";
 
 const Editor = () => {
   const [mode, setMode] = useState<CustomMode>(() => {
@@ -44,7 +44,7 @@ const Editor = () => {
     };
   });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
-  const { isConnected: lcxl3Connected, fetchCurrentMode } = useLCXL3Device();
+  const { device, isConnected: lcxl3Connected, fetchCurrentMode } = useLCXL3Device();
 
   const selectedControlInfo = selectedControl ? getControlInfo(selectedControl) : null;
   const selectedControlMapping = selectedControl ? mode.controls[selectedControl] : null;
@@ -141,6 +141,26 @@ const Editor = () => {
     }
   };
 
+  const handleSend = async () => {
+    if (!device) {
+      toast.error('Device not connected');
+      return;
+    }
+
+    try {
+      toast.info('Sending mode to device...');
+
+      const lcxl3Mode = customModeToLCXL3Mode(mode);
+      await device.saveCustomMode(0, lcxl3Mode);
+
+      toast.success('Mode sent successfully to device!');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to send mode';
+      toast.error(`Send failed: ${message}`);
+      console.error('Send error:', error);
+    }
+  };
+
   useEffect(() => {
     saveModeToStorage(mode);
   }, [mode]);
@@ -185,6 +205,7 @@ const Editor = () => {
             Fetch
           </Button>
           <Button
+            onClick={handleSend}
             disabled={!lcxl3Connected}
             size="sm"
             className="bg-secondary text-secondary-foreground shadow-glow-secondary"
