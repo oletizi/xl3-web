@@ -22,5 +22,6 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     global: 'globalThis',
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
   },
 }));

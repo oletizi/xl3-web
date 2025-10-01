@@ -1,44 +1,8 @@
 import type { CustomMode, ControlMapping } from '@/types/mode';
-
-/**
- * LCXL3 Control mapping format from @oletizi/launch-control-xl3 library
- */
-export interface LCXL3Control {
-  controlId: number;
-  type?: 'knob' | 'fader' | 'button';
-  controlType?: 'knob' | 'fader' | 'button';
-  midiChannel?: number;
-  channel?: number;
-  ccNumber?: number;
-  cc?: number;
-  minValue?: number;
-  min?: number;
-  maxValue?: number;
-  max?: number;
-  behavior?: 'absolute' | 'relative' | 'toggle';
-  behaviour?: string;
-  transform?: string | ((value: number) => number);
-}
-
-/**
- * LCXL3 Mode format from @oletizi/launch-control-xl3 library
- */
-export interface LCXL3CustomMode {
-  name: string;
-  controls: Record<string, LCXL3Control> | LCXL3Control[];
-  labels?: Map<number, string>;
-  colors?: Map<number, number>;
-  leds?: Map<number, { color: number | string; behaviour: string }>;
-  metadata?: {
-    name?: string;
-    description?: string;
-    version?: string;
-    slot?: number;
-    createdAt?: Date;
-    modifiedAt?: Date;
-    [key: string]: any;
-  };
-}
+import type {
+  CustomMode as LCXL3CustomMode,
+  ControlMapping as LCXL3Control
+} from '@oletizi/launch-control-xl3';
 
 /**
  * Mapping from CC numbers and control types to our control IDs
@@ -175,9 +139,29 @@ const LCXL3_TO_APP_CONTROL_MAP: Record<number, string> = {
 export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
   const controls: Record<string, ControlMapping> = {};
 
-  const controlsArray = Array.isArray(lcxl3Mode.controls)
-    ? lcxl3Mode.controls
-    : Object.values(lcxl3Mode.controls);
+  if (!lcxl3Mode.controls) {
+    console.warn('No controls found in mode:', lcxl3Mode);
+    return {
+      name: lcxl3Mode.name || 'Fetched Mode',
+      description: `Fetched from device on ${new Date().toLocaleString()}`,
+      version: '1.0.0',
+      controls: {},
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString()
+    };
+  }
+
+  let controlsArray: LCXL3Control[];
+  if (Array.isArray(lcxl3Mode.controls)) {
+    controlsArray = lcxl3Mode.controls;
+  } else if (lcxl3Mode.controls instanceof Map) {
+    controlsArray = Array.from(lcxl3Mode.controls.values());
+  } else if (typeof lcxl3Mode.controls === 'object') {
+    controlsArray = Object.values(lcxl3Mode.controls);
+  } else {
+    console.error('Unknown controls format:', typeof lcxl3Mode.controls, lcxl3Mode.controls);
+    throw new Error(`Invalid controls format: ${typeof lcxl3Mode.controls}`);
+  }
 
   for (const control of controlsArray) {
     // Try to determine control ID using different methods

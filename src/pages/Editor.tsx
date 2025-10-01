@@ -26,6 +26,10 @@ import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetada
 import { loadModeFromStorage, saveModeToStorage, clearModeFromStorage } from "@/utils/statePersistence";
 import { useLCXL3Device } from "@/contexts/LCXL3Context";
 import { lcxl3ModeToCustomMode, customModeToLCXL3Mode } from "@/utils/modeConverter";
+import { VERSION as LCXL3_VERSION } from "@oletizi/launch-control-xl3";
+import packageJson from "../../package.json";
+
+declare const __BUILD_TIMESTAMP__: string;
 
 const Editor = () => {
   const [mode, setMode] = useState<CustomMode>(() => {
@@ -179,6 +183,9 @@ const Editor = () => {
           </h1>
           <p className="text-muted-foreground mt-2">
             Design custom control mappings for your Launch Control XL3
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            UI version: {packageJson.version}; Library version: @oletizi/launch-control-xl3@{packageJson.dependencies["@oletizi/launch-control-xl3"].replace("^", "")} | Built: {new Date(__BUILD_TIMESTAMP__).toLocaleString()}
           </p>
         </div>
 
