@@ -217,7 +217,7 @@ export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
       midiChannel,
       minValue,
       maxValue,
-      label: ''
+      label: control.name || ''
     };
   }
 
@@ -330,10 +330,11 @@ export function customModeToLCXL3Mode(customMode: CustomMode): LCXL3CustomMode {
       cc: control.ccNumber,               // Library uses 'cc' not 'ccNumber'
       min: control.minValue,              // Library uses 'min' not 'minValue'
       max: control.maxValue,              // Library uses 'max' not 'maxValue'
-      behaviour: 'absolute'               // Library uses 'behaviour' not 'behavior'
+      behaviour: 'absolute',              // Library uses 'behaviour' not 'behavior'
+      name: control.label                 // Add label as 'name' property
     };
 
-    // Add label to labels map if provided
+    // Add label to labels map if provided (for compatibility)
     if (control.label) {
       labels.set(APP_TO_LCXL3_CONTROL_MAP[ourControlId], control.label);
     }
