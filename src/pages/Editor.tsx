@@ -124,13 +124,34 @@ const Editor = () => {
       toast.info('Fetching mode from device...');
 
       const lcxl3Mode = await fetchCurrentMode();
-      const fetchedMode = lcxl3ModeToCustomMode(lcxl3Mode);
+      console.log('Raw mode from device:', lcxl3Mode);
+      console.log('Controls array:', lcxl3Mode.controls);
 
+      // Log a sample control from the Record
+      const firstControlEntry = Object.entries(lcxl3Mode.controls)[0];
+      if (firstControlEntry) {
+        console.log('First control key:', firstControlEntry[0]);
+        console.log('First control value:', firstControlEntry[1]);
+      }
+
+      const fetchedMode = lcxl3ModeToCustomMode(lcxl3Mode);
+      console.log('Converted mode:', fetchedMode);
+      console.log('Sample fetched control:', Object.entries(fetchedMode.controls)[0]);
+
+      // Merge with defaults, but preserve fetched labels
       const defaultControls = initializeDefaultControls();
-      const mergedControls = {
-        ...defaultControls,
-        ...fetchedMode.controls
-      };
+      const mergedControls: Record<string, any> = {};
+
+      for (const [id, defaultControl] of Object.entries(defaultControls)) {
+        const fetchedControl = fetchedMode.controls[id];
+        if (fetchedControl) {
+          // Use fetched control, which has the correct label
+          mergedControls[id] = fetchedControl;
+        } else {
+          // Use default control if not fetched
+          mergedControls[id] = defaultControl;
+        }
+      }
 
       setMode({
         ...fetchedMode,
