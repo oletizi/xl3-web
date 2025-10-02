@@ -1,11 +1,12 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useLCXL3Device } from "@/contexts/LCXL3Context";
 import { Button } from "@/components/ui/button";
-import { 
-  Edit3, 
-  Library, 
-  Globe, 
-  Settings, 
+import {
+  Edit3,
+  Library,
+  Globe,
+  Settings,
   Power,
   Zap,
   Activity
@@ -18,6 +19,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
+  const { isConnected, device, error } = useLCXL3Device();
 
   const navItems = [
     { path: "/", label: "Editor", icon: Edit3 },
@@ -72,13 +74,15 @@ const Layout = ({ children }: LayoutProps) => {
 
           <div className="flex items-center space-x-2">
             {/* Device Status Indicator */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="flex items-center space-x-2 px-3 py-1 rounded-lg bg-muted/50 hover:bg-muted/70"
             >
-              <Activity className="w-4 h-4 text-destructive animate-pulse" />
-              <span className="text-sm text-muted-foreground">Disconnected</span>
+              <Activity className={`w-4 h-4 ${isConnected ? 'text-green-500' : 'text-destructive animate-pulse'}`} />
+              <span className="text-sm text-muted-foreground">
+                {isConnected ? 'Connected: Launch Control XL3' : (error ? `Error: ${error}` : 'Disconnected')}
+              </span>
             </Button>
             
             <Button variant="ghost" size="sm">

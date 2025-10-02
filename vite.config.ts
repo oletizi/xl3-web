@@ -15,4 +15,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      external: ['module', 'fs', 'path'],
+    },
+  },
+  define: {
+    global: 'globalThis',
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+  },
 }));
