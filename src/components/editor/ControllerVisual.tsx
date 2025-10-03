@@ -1,6 +1,9 @@
-import { motion } from "framer-motion";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import type { ControlMapping } from "@/types/mode";
+import { Knob } from "@/components/editor/controls/Knob";
+import { Fader } from "@/components/editor/controls/Fader";
+import { Button } from "@/components/editor/controls/Button";
 
 interface ControllerVisualProps {
   selectedControl: string | null;
@@ -9,377 +12,239 @@ interface ControllerVisualProps {
   onLabelUpdate: (controlId: string, newLabel: string) => void;
 }
 
-const ControllerVisual = ({ selectedControl, onControlSelect, controls, onLabelUpdate }: ControllerVisualProps) => {
+const ControllerVisual = ({
+  selectedControl,
+  onControlSelect,
+  controls,
+  onLabelUpdate,
+}: ControllerVisualProps) => {
   const [editingControl, setEditingControl] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
-  const getControlLabel = (controlId: string, defaultLabel: string) => {
-    return controls[controlId]?.label || defaultLabel;
-  };
-
-  const isNonDefaultLabel = (controlId: string, defaultLabel: string) => {
-    const label = controls[controlId]?.label;
-    return label && label !== defaultLabel;
-  };
-
-  const handleLabelDoubleClick = (controlId: string) => {
-    const currentLabel = getControlLabel(controlId, "");
+  const handleEditStart = (controlId: string) => {
+    const currentLabel = controls[controlId]?.label || "";
     setEditingControl(controlId);
     setEditValue(currentLabel);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, controlId: string) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      onLabelUpdate(controlId, editValue);
-      setEditingControl(null);
-    } else if (e.key === 'Escape') {
-      setEditingControl(null);
+  const handleEditEnd = () => {
+    if (editingControl && editValue) {
+      onLabelUpdate(editingControl, editValue);
     }
+    setEditingControl(null);
   };
-  // Top row knobs (CC 13-20) with red LEDs
+
+  const handleEditCancel = () => {
+    setEditingControl(null);
+  };
+
+  // Define control arrays with their properties
   const topKnobs = [
-    { id: "knob-cc13", x: 180, y: 120, cc: 13, ledColor: "led-red" },
-    { id: "knob-cc14", x: 280, y: 120, cc: 14, ledColor: "led-red" },
-    { id: "knob-cc15", x: 380, y: 120, cc: 15, ledColor: "led-red" },
-    { id: "knob-cc16", x: 480, y: 120, cc: 16, ledColor: "led-red" },
-    { id: "knob-cc17", x: 580, y: 120, cc: 17, ledColor: "led-red" },
-    { id: "knob-cc18", x: 680, y: 120, cc: 18, ledColor: "led-red" },
-    { id: "knob-cc19", x: 780, y: 120, cc: 19, ledColor: "led-red" },
-    { id: "knob-cc20", x: 880, y: 120, cc: 20, ledColor: "led-red" },
+    { id: "knob-cc13", cc: 13, ledColor: "led-red" as const },
+    { id: "knob-cc14", cc: 14, ledColor: "led-red" as const },
+    { id: "knob-cc15", cc: 15, ledColor: "led-red" as const },
+    { id: "knob-cc16", cc: 16, ledColor: "led-red" as const },
+    { id: "knob-cc17", cc: 17, ledColor: "led-red" as const },
+    { id: "knob-cc18", cc: 18, ledColor: "led-red" as const },
+    { id: "knob-cc19", cc: 19, ledColor: "led-red" as const },
+    { id: "knob-cc20", cc: 20, ledColor: "led-red" as const },
   ];
 
-  // Middle row knobs (CC 53, CC 22-28) with orange LEDs
   const middleKnobs = [
-    { id: "knob-cc53", x: 180, y: 220, cc: 53, ledColor: "led-orange" },
-    { id: "knob-cc22", x: 280, y: 220, cc: 22, ledColor: "led-orange" },
-    { id: "knob-cc23", x: 380, y: 220, cc: 23, ledColor: "led-orange" },
-    { id: "knob-cc24", x: 480, y: 220, cc: 24, ledColor: "led-orange" },
-    { id: "knob-cc25", x: 580, y: 220, cc: 25, ledColor: "led-orange" },
-    { id: "knob-cc26", x: 680, y: 220, cc: 26, ledColor: "led-orange" },
-    { id: "knob-cc27", x: 780, y: 220, cc: 27, ledColor: "led-orange" },
-    { id: "knob-cc28", x: 880, y: 220, cc: 28, ledColor: "led-orange" },
+    { id: "knob-cc53", cc: 53, ledColor: "led-orange" as const },
+    { id: "knob-cc22", cc: 22, ledColor: "led-orange" as const },
+    { id: "knob-cc23", cc: 23, ledColor: "led-orange" as const },
+    { id: "knob-cc24", cc: 24, ledColor: "led-orange" as const },
+    { id: "knob-cc25", cc: 25, ledColor: "led-orange" as const },
+    { id: "knob-cc26", cc: 26, ledColor: "led-orange" as const },
+    { id: "knob-cc27", cc: 27, ledColor: "led-orange" as const },
+    { id: "knob-cc28", cc: 28, ledColor: "led-orange" as const },
   ];
 
-  // Bottom row knobs (CC 29-36) with yellow LEDs
   const bottomKnobs = [
-    { id: "knob-cc29", x: 180, y: 320, cc: 29, ledColor: "led-yellow" },
-    { id: "knob-cc30", x: 280, y: 320, cc: 30, ledColor: "led-yellow" },
-    { id: "knob-cc31", x: 380, y: 320, cc: 31, ledColor: "led-yellow" },
-    { id: "knob-cc32", x: 480, y: 320, cc: 32, ledColor: "led-yellow" },
-    { id: "knob-cc33", x: 580, y: 320, cc: 33, ledColor: "led-yellow" },
-    { id: "knob-cc34", x: 680, y: 320, cc: 34, ledColor: "led-yellow" },
-    { id: "knob-cc35", x: 780, y: 320, cc: 35, ledColor: "led-yellow" },
-    { id: "knob-cc36", x: 880, y: 320, cc: 36, ledColor: "led-yellow" },
+    { id: "knob-cc29", cc: 29, ledColor: "led-yellow" as const },
+    { id: "knob-cc30", cc: 30, ledColor: "led-yellow" as const },
+    { id: "knob-cc31", cc: 31, ledColor: "led-yellow" as const },
+    { id: "knob-cc32", cc: 32, ledColor: "led-yellow" as const },
+    { id: "knob-cc33", cc: 33, ledColor: "led-yellow" as const },
+    { id: "knob-cc34", cc: 34, ledColor: "led-yellow" as const },
+    { id: "knob-cc35", cc: 35, ledColor: "led-yellow" as const },
+    { id: "knob-cc36", cc: 36, ledColor: "led-yellow" as const },
   ];
 
-  // Vertical faders (CC 5-12)
   const faders = [
-    { id: "fader-cc5", x: 180, y: 400, cc: 5 },
-    { id: "fader-cc6", x: 280, y: 400, cc: 6 },
-    { id: "fader-cc7", x: 380, y: 400, cc: 7 },
-    { id: "fader-cc8", x: 480, y: 400, cc: 8 },
-    { id: "fader-cc9", x: 580, y: 400, cc: 9 },
-    { id: "fader-cc10", x: 680, y: 400, cc: 10 },
-    { id: "fader-cc11", x: 780, y: 400, cc: 11 },
-    { id: "fader-cc12", x: 880, y: 400, cc: 12 },
+    { id: "fader-cc5", cc: 5 },
+    { id: "fader-cc6", cc: 6 },
+    { id: "fader-cc7", cc: 7 },
+    { id: "fader-cc8", cc: 8 },
+    { id: "fader-cc9", cc: 9 },
+    { id: "fader-cc10", cc: 10 },
+    { id: "fader-cc11", cc: 11 },
+    { id: "fader-cc12", cc: 12 },
   ];
 
-  // Top button row (CC 37-44) - Green LEDs
   const topButtons = [
-    { id: "button-cc37", x: 180, y: 580, cc: 37, ledColor: "led-green" },
-    { id: "button-cc38", x: 280, y: 580, cc: 38, ledColor: "led-green" },
-    { id: "button-cc39", x: 380, y: 580, cc: 39, ledColor: "led-green" },
-    { id: "button-cc40", x: 480, y: 580, cc: 40, ledColor: "led-green" },
-    { id: "button-cc41", x: 580, y: 580, cc: 41, ledColor: "led-green" },
-    { id: "button-cc42", x: 680, y: 580, cc: 42, ledColor: "led-green" },
-    { id: "button-cc43", x: 780, y: 580, cc: 43, ledColor: "led-green" },
-    { id: "button-cc44", x: 880, y: 580, cc: 44, ledColor: "led-green" },
+    { id: "button-cc37", cc: 37, ledColor: "led-green" as const },
+    { id: "button-cc38", cc: 38, ledColor: "led-green" as const },
+    { id: "button-cc39", cc: 39, ledColor: "led-green" as const },
+    { id: "button-cc40", cc: 40, ledColor: "led-green" as const },
+    { id: "button-cc41", cc: 41, ledColor: "led-green" as const },
+    { id: "button-cc42", cc: 42, ledColor: "led-green" as const },
+    { id: "button-cc43", cc: 43, ledColor: "led-green" as const },
+    { id: "button-cc44", cc: 44, ledColor: "led-green" as const },
   ];
 
-  // Bottom button row (CC 45-52) - Blue LEDs
   const bottomButtons = [
-    { id: "button-cc45", x: 180, y: 660, cc: 45, ledColor: "primary" },
-    { id: "button-cc46", x: 280, y: 660, cc: 46, ledColor: "primary" },
-    { id: "button-cc47", x: 380, y: 660, cc: 47, ledColor: "primary" },
-    { id: "button-cc48", x: 480, y: 660, cc: 48, ledColor: "primary" },
-    { id: "button-cc49", x: 580, y: 660, cc: 49, ledColor: "primary" },
-    { id: "button-cc50", x: 680, y: 660, cc: 50, ledColor: "primary" },
-    { id: "button-cc51", x: 780, y: 660, cc: 51, ledColor: "primary" },
-    { id: "button-cc52", x: 880, y: 660, cc: 52, ledColor: "primary" },
+    { id: "button-cc45", cc: 45, ledColor: "primary" as const },
+    { id: "button-cc46", cc: 46, ledColor: "primary" as const },
+    { id: "button-cc47", cc: 47, ledColor: "primary" as const },
+    { id: "button-cc48", cc: 48, ledColor: "primary" as const },
+    { id: "button-cc49", cc: 49, ledColor: "primary" as const },
+    { id: "button-cc50", cc: 50, ledColor: "primary" as const },
+    { id: "button-cc51", cc: 51, ledColor: "primary" as const },
+    { id: "button-cc52", cc: 52, ledColor: "primary" as const },
   ];
-
-  const renderKnob = (knob: { id: string; x: number; y: number; cc: number; ledColor: string }, index: number) => (
-    <g key={knob.id}>
-      <motion.circle
-        cx={knob.x}
-        cy={knob.y}
-        r="18"
-        className={`cursor-pointer transition-all duration-200 stroke-2 ${
-          selectedControl === knob.id 
-            ? "fill-hardware-knob-active stroke-primary shadow-glow-primary" 
-            : "fill-hardware-knob stroke-border hover:stroke-primary/50"
-        }`}
-        onClick={() => onControlSelect(knob.id)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.03 }}
-      />
-      
-      {/* Knob Indicator Line */}
-      <motion.line
-        x1={knob.x}
-        y1={knob.y - 15}
-        x2={knob.x}
-        y2={knob.y - 8}
-        className={`stroke-2 ${
-          selectedControl === knob.id ? "stroke-background" : "stroke-muted-foreground"
-        }`}
-        style={{ transformOrigin: `${knob.x}px ${knob.y}px` }}
-      />
-      
-      {/* LED Indicator Below Knob - full brightness */}
-      <circle 
-        cx={knob.x} 
-        cy={knob.y + 30} 
-        r="4" 
-        className={`fill-${knob.ledColor} transition-opacity duration-300`}
-        style={{ 
-          opacity: 1,
-          filter: selectedControl === knob.id ? 'brightness(1.5) drop-shadow(0 0 6px currentColor)' : 'none'
-        }}
-      />
-      
-      {/* CC Number Label */}
-      <text 
-        x={knob.x} 
-        y={knob.y + 45} 
-        textAnchor="middle" 
-        className="fill-muted-foreground text-xs font-medium"
-      >
-        CC {knob.cc}
-      </text>
-      
-      {/* Control Label */}
-      {editingControl === knob.id ? (
-        <foreignObject x={knob.x - 35} y={knob.y + 48} width="70" height="20">
-          <input
-            type="text"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, knob.id)}
-            onBlur={() => setEditingControl(null)}
-            autoFocus
-            className="w-full text-xs text-center bg-background border border-primary rounded px-1 py-0 h-full"
-            style={{ fontSize: '12px' }}
-          />
-        </foreignObject>
-      ) : (
-        <text
-          x={knob.x}
-          y={knob.y + 60}
-          textAnchor="middle"
-          className={`text-xs font-semibold cursor-pointer hover:fill-primary transition-colors ${
-            isNonDefaultLabel(knob.id, `Knob ${knob.cc}`) ? 'fill-green-500' : 'fill-foreground'
-          }`}
-          onDoubleClick={() => handleLabelDoubleClick(knob.id)}
-        >
-          {getControlLabel(knob.id, `Knob ${knob.cc}`)}
-        </text>
-      )}
-    </g>
-  );
-
-  const renderFader = (fader: { id: string; x: number; y: number; cc: number }, index: number) => (
-    <g key={fader.id}>
-      {/* Fader Track */}
-      <rect 
-        x={fader.x - 8} 
-        y={fader.y} 
-        width="16" 
-        height="120" 
-        rx="8"
-        className="fill-muted stroke-border stroke-2"
-      />
-      
-      {/* Fader Handle */}
-      <motion.rect
-        x={fader.x - 15}
-        y={fader.y + 50}
-        width="30"
-        height="20"
-        rx="4"
-        className={`cursor-pointer transition-all duration-200 stroke-2 ${
-          selectedControl === fader.id 
-            ? "fill-secondary stroke-secondary shadow-glow-secondary" 
-            : "fill-hardware-button stroke-border hover:stroke-secondary/50"
-        }`}
-        onClick={() => onControlSelect(fader.id)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 + index * 0.05 }}
-      />
-      
-      {/* CC Number Label */}
-      <text 
-        x={fader.x} 
-        y={fader.y + 140} 
-        textAnchor="middle" 
-        className="fill-muted-foreground text-xs font-medium"
-      >
-        CC {fader.cc}
-      </text>
-      
-      {/* Control Label */}
-      {editingControl === fader.id ? (
-        <foreignObject x={fader.x - 35} y={fader.y + 143} width="70" height="20">
-          <input
-            type="text"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, fader.id)}
-            onBlur={() => setEditingControl(null)}
-            autoFocus
-            className="w-full text-xs text-center bg-background border border-primary rounded px-1 py-0 h-full"
-            style={{ fontSize: '12px' }}
-          />
-        </foreignObject>
-      ) : (
-        <text
-          x={fader.x}
-          y={fader.y + 155}
-          textAnchor="middle"
-          className={`text-xs font-semibold cursor-pointer hover:fill-primary transition-colors ${
-            isNonDefaultLabel(fader.id, `Fader ${fader.cc}`) ? 'fill-green-500' : 'fill-foreground'
-          }`}
-          onDoubleClick={() => handleLabelDoubleClick(fader.id)}
-        >
-          {getControlLabel(fader.id, `Fader ${fader.cc}`)}
-        </text>
-      )}
-    </g>
-  );
-
-  const renderButton = (button: { id: string; x: number; y: number; cc: number; ledColor: string }, index: number, isTop: boolean) => (
-    <g key={button.id}>
-      {/* Button Body */}
-      <motion.rect
-        x={button.x - 25}
-        y={button.y - 10}
-        width="50"
-        height="20"
-        rx="10"
-        className={`cursor-pointer transition-all duration-200 stroke-2 ${
-          selectedControl === button.id 
-            ? `fill-hardware-${button.ledColor} stroke-${button.ledColor} shadow-glow-primary` 
-            : "fill-hardware-button stroke-border hover:stroke-primary/50"
-        }`}
-        onClick={() => onControlSelect(button.id)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: (isTop ? 0.8 : 0.9) + index * 0.03 }}
-      />
-      
-      {/* LED Indicator */}
-      <rect 
-        x={button.x - 20} 
-        y={button.y - 6} 
-        width="40" 
-        height="6" 
-        rx="3"
-        className={`fill-${button.ledColor} ${
-          selectedControl === button.id ? 'animate-pulse' : ''
-        }`}
-        style={{ opacity: 1 }}
-      />
-      
-      {/* CC Number Label */}
-      <text 
-        x={button.x} 
-        y={button.y + 30} 
-        textAnchor="middle" 
-        className="fill-muted-foreground text-xs font-medium"
-      >
-        CC {button.cc}
-      </text>
-      
-      {/* Control Label */}
-      {editingControl === button.id ? (
-        <foreignObject x={button.x - 35} y={button.y + 33} width="70" height="20">
-          <input
-            type="text"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, button.id)}
-            onBlur={() => setEditingControl(null)}
-            autoFocus
-            className="w-full text-xs text-center bg-background border border-primary rounded px-1 py-0 h-full"
-            style={{ fontSize: '12px' }}
-          />
-        </foreignObject>
-      ) : (
-        <text
-          x={button.x}
-          y={button.y + 45}
-          textAnchor="middle"
-          className={`text-xs font-semibold cursor-pointer hover:fill-primary transition-colors ${
-            isNonDefaultLabel(button.id, `Button ${button.cc}`) ? 'fill-green-500' : 'fill-foreground'
-          }`}
-          onDoubleClick={() => handleLabelDoubleClick(button.id)}
-        >
-          {getControlLabel(button.id, `Button ${button.cc}`)}
-        </text>
-      )}
-    </g>
-  );
 
   return (
-    <div className="flex justify-center">
-      <motion.svg
-        width="1120"
-        height="800"
-        viewBox="0 0 1120 800"
-        className="max-w-full h-auto"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Controller Body */}
-        <rect
-          x="60"
-          y="60"
-          width="1000"
-          height="680"
-          rx="30"
-          className="fill-card stroke-border stroke-2"
-          filter="drop-shadow(0 0 20px hsl(var(--primary) / 0.1))"
-        />
+    <motion.div
+      className="w-full max-w-6xl mx-auto p-8 bg-gradient-surface border border-border/50 rounded-3xl"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="space-y-6">
+        {/* Top Row Knobs */}
+        <div className="grid grid-cols-8 gap-4 justify-items-center">
+          {topKnobs.map((knob) => (
+            <Knob
+              key={knob.id}
+              id={knob.id}
+              cc={knob.cc}
+              ledColor={knob.ledColor}
+              isSelected={selectedControl === knob.id}
+              control={controls[knob.id]}
+              onSelect={onControlSelect}
+              onLabelUpdate={onLabelUpdate}
+              isEditing={editingControl === knob.id}
+              editValue={editValue}
+              onEditChange={setEditValue}
+              onEditStart={() => handleEditStart(knob.id)}
+              onEditEnd={handleEditEnd}
+              onEditCancel={handleEditCancel}
+            />
+          ))}
+        </div>
 
-        {/* Top Row Knobs (CC 13-20) */}
-        {topKnobs.map((knob, index) => renderKnob(knob, index))}
+        {/* Middle Row Knobs */}
+        <div className="grid grid-cols-8 gap-4 justify-items-center">
+          {middleKnobs.map((knob) => (
+            <Knob
+              key={knob.id}
+              id={knob.id}
+              cc={knob.cc}
+              ledColor={knob.ledColor}
+              isSelected={selectedControl === knob.id}
+              control={controls[knob.id]}
+              onSelect={onControlSelect}
+              onLabelUpdate={onLabelUpdate}
+              isEditing={editingControl === knob.id}
+              editValue={editValue}
+              onEditChange={setEditValue}
+              onEditStart={() => handleEditStart(knob.id)}
+              onEditEnd={handleEditEnd}
+              onEditCancel={handleEditCancel}
+            />
+          ))}
+        </div>
 
-        {/* Middle Row Knobs (CC 53, CC 22-28) */}
-        {middleKnobs.map((knob, index) => renderKnob(knob, index + 8))}
+        {/* Bottom Row Knobs */}
+        <div className="grid grid-cols-8 gap-4 justify-items-center">
+          {bottomKnobs.map((knob) => (
+            <Knob
+              key={knob.id}
+              id={knob.id}
+              cc={knob.cc}
+              ledColor={knob.ledColor}
+              isSelected={selectedControl === knob.id}
+              control={controls[knob.id]}
+              onSelect={onControlSelect}
+              onLabelUpdate={onLabelUpdate}
+              isEditing={editingControl === knob.id}
+              editValue={editValue}
+              onEditChange={setEditValue}
+              onEditStart={() => handleEditStart(knob.id)}
+              onEditEnd={handleEditEnd}
+              onEditCancel={handleEditCancel}
+            />
+          ))}
+        </div>
 
-        {/* Bottom Row Knobs (CC 29-36) */}
-        {bottomKnobs.map((knob, index) => renderKnob(knob, index + 16))}
+        {/* Faders */}
+        <div className="grid grid-cols-8 gap-4 justify-items-center pt-4">
+          {faders.map((fader) => (
+            <Fader
+              key={fader.id}
+              id={fader.id}
+              cc={fader.cc}
+              isSelected={selectedControl === fader.id}
+              control={controls[fader.id]}
+              onSelect={onControlSelect}
+              onLabelUpdate={onLabelUpdate}
+              isEditing={editingControl === fader.id}
+              editValue={editValue}
+              onEditChange={setEditValue}
+              onEditStart={() => handleEditStart(fader.id)}
+              onEditEnd={handleEditEnd}
+              onEditCancel={handleEditCancel}
+            />
+          ))}
+        </div>
 
-        {/* Faders (CC 5-12) */}
-        {faders.map((fader, index) => renderFader(fader, index))}
+        {/* Top Buttons */}
+        <div className="grid grid-cols-8 gap-4 justify-items-center pt-4">
+          {topButtons.map((button) => (
+            <Button
+              key={button.id}
+              id={button.id}
+              cc={button.cc}
+              ledColor={button.ledColor}
+              isSelected={selectedControl === button.id}
+              control={controls[button.id]}
+              onSelect={onControlSelect}
+              onLabelUpdate={onLabelUpdate}
+              isEditing={editingControl === button.id}
+              editValue={editValue}
+              onEditChange={setEditValue}
+              onEditStart={() => handleEditStart(button.id)}
+              onEditEnd={handleEditEnd}
+              onEditCancel={handleEditCancel}
+            />
+          ))}
+        </div>
 
-        {/* Top Button Row (CC 37-44) */}
-        {topButtons.map((button, index) => renderButton(button, index, true))}
-
-        {/* Bottom Button Row (CC 45-52) */}
-        {bottomButtons.map((button, index) => renderButton(button, index, false))}
-      </motion.svg>
-    </div>
+        {/* Bottom Buttons */}
+        <div className="grid grid-cols-8 gap-4 justify-items-center">
+          {bottomButtons.map((button) => (
+            <Button
+              key={button.id}
+              id={button.id}
+              cc={button.cc}
+              ledColor={button.ledColor}
+              isSelected={selectedControl === button.id}
+              control={controls[button.id]}
+              onSelect={onControlSelect}
+              onLabelUpdate={onLabelUpdate}
+              isEditing={editingControl === button.id}
+              editValue={editValue}
+              onEditChange={setEditValue}
+              onEditStart={() => handleEditStart(button.id)}
+              onEditEnd={handleEditEnd}
+              onEditCancel={handleEditCancel}
+            />
+          ))}
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
