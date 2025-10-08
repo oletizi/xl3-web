@@ -1,337 +1,274 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Search, 
-  Download, 
-  Heart,
-  Star,
-  TrendingUp,
-  Clock,
-  Users,
-  Filter,
-  Globe,
-  Award,
-  Zap
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { AlertCircle, Loader2, PackageOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
+import { usePublicModes } from "@/hooks/use-cloud-modes";
+import { ModeFilters } from "@/types/cloud-mode";
+import { ModeCard } from "@/components/cloud-storage/ModeCard";
+import { CatalogFilters } from "@/components/cloud-storage/CatalogFilters";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 const Catalog = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  // Mock data for community modes
-  const featuredModes = [
-    {
-      id: "f1",
-      name: "Pro Studio Template",
-      description: "Professional studio mixing setup used by Grammy winners",
-      author: "StudioMaster",
-      category: "Professional",
-      tags: ["mixing", "studio", "professional"],
-      downloads: 2540,
-      likes: 1892,
-      rating: 4.9,
-      thumbnail: "gradient-primary",
-      featured: true
-    },
-    {
-      id: "f2",
-      name: "Live DJ Performance",
-      description: "Perfect for live DJ sets and club performances",
-      author: "DJProAudio",
-      category: "Performance",
-      tags: ["dj", "live", "performance", "club"],
-      downloads: 1876,
-      likes: 1432,
-      rating: 4.8,
-      thumbnail: "gradient-secondary",
-      featured: true
-    },
-  ];
+  // Filter state
+  const [filters, setFilters] = useState<ModeFilters>({
+    sort: 'recent',
+    limit: 24,
+    page: 1,
+  });
 
-  const popularModes = [
-    {
-      id: "p1",
-      name: "Beginner's DAW Control",
-      description: "Simple setup for newcomers to digital audio workstations",
-      author: "EasyAudio",
-      category: "Educational",
-      tags: ["beginner", "daw", "simple"],
-      downloads: 5420,
-      likes: 2156,
-      rating: 4.7,
-      thumbnail: "gradient-accent"
-    },
-    {
-      id: "p2",
-      name: "Trap Producer Kit",
-      description: "Optimized for trap and hip-hop production workflows",
-      author: "BeatMaker808",
-      category: "Genre",
-      tags: ["trap", "hiphop", "beats"],
-      downloads: 3890,
-      likes: 1765,
-      rating: 4.6,
-      thumbnail: "gradient-primary"
-    },
-    {
-      id: "p3",
-      name: "Ambient Soundscape",
-      description: "Perfect for creating atmospheric and ambient music",
-      author: "AtmosphericSounds",
-      category: "Genre",
-      tags: ["ambient", "atmospheric", "soundscape"],
-      downloads: 2134,
-      likes: 987,
-      rating: 4.5,
-      thumbnail: "gradient-secondary"
-    },
-  ];
+  // Fetch public modes
+  const { data, isLoading, error } = usePublicModes(filters);
 
-  const ModeCard = ({ mode, index, large = false }: { mode: any, index: number, large?: boolean }) => (
+  /**
+   * Handle filter changes from CatalogFilters component
+   */
+  const handleFilterChange = (newFilters: ModeFilters) => {
+    setFilters(newFilters);
+  };
+
+  /**
+   * Handle page navigation
+   */
+  const handlePageChange = (newPage: number) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  /**
+   * Handle mode selection (navigate to detail view)
+   */
+  const handleModeSelect = (modeId: string) => {
+    navigate(`/modes/${modeId}`);
+  };
+
+  /**
+   * Handle mode load (apply to editor)
+   */
+  const handleModeLoad = (modeId: string) => {
+    // TODO: Implement mode loading to editor
+    navigate(`/editor?mode=${modeId}`);
+  };
+
+  /**
+   * Render loading skeletons
+   */
+  const renderSkeletons = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: filters.limit || 24 }).map((_, i) => (
+        <div key={i} className="space-y-4">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+
+  /**
+   * Render empty state
+   */
+  const renderEmptyState = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+      className="flex flex-col items-center justify-center py-16 space-y-4"
     >
-      <Card className={`p-6 bg-gradient-surface border-border/50 hover:border-primary/50 transition-all duration-200 group ${large ? 'lg:p-8' : ''}`}>
-        <div className="space-y-4">
-          {/* Thumbnail */}
-          <div className={`${large ? 'h-32' : 'h-24'} rounded-lg bg-${mode.thumbnail} relative overflow-hidden`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/20" />
-            <div className="absolute top-2 right-2 flex space-x-1">
-              {mode.featured && (
-                <Badge className="bg-warning text-warning-foreground">
-                  <Award className="w-3 h-3 mr-1" />
-                  Featured
-                </Badge>
-              )}
-            </div>
-            <div className="absolute bottom-2 left-2">
-              <div className="flex items-center space-x-2 text-white/90">
-                <div className="flex items-center space-x-1">
-                  <Download className="w-3 h-3" />
-                  <span className="text-xs">{mode.downloads.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Heart className="w-3 h-3" />
-                  <span className="text-xs">{mode.likes.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="space-y-2">
-            <div className="flex items-start justify-between">
-              <h3 className={`font-semibold text-foreground group-hover:text-primary transition-colors ${large ? 'text-lg' : ''}`}>
-                {mode.name}
-              </h3>
-              <div className="flex items-center space-x-1">
-                <Star className="w-4 h-4 text-warning fill-warning" />
-                <span className="text-sm text-muted-foreground">{mode.rating}</span>
-              </div>
-            </div>
-            
-            <p className="text-sm text-muted-foreground">
-              by <span className="text-primary">{mode.author}</span>
-            </p>
-            
-            <p className={`text-sm text-muted-foreground ${large ? '' : 'line-clamp-2'}`}>
-              {mode.description}
-            </p>
-
-            <div className="flex flex-wrap gap-1">
-              <Badge variant="outline" className="text-xs">
-                {mode.category}
-              </Badge>
-              {mode.tags.slice(0, 3).map((tag: string) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-between pt-2 border-t border-border/50">
-            <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-              <div className="flex items-center space-x-1">
-                <Users className="w-3 h-3" />
-                <span>{mode.downloads}</span>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button variant="ghost" size="sm">
-                <Heart className="w-4 h-4" />
-              </Button>
-              <Button size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
+      <PackageOpen className="h-24 w-24 text-muted-foreground/50" />
+      <h3 className="text-xl font-semibold">No Modes Found</h3>
+      <p className="text-muted-foreground text-center max-w-md">
+        {filters.search || filters.category || filters.tags
+          ? "Try adjusting your filters to find more modes."
+          : "Be the first to share a mode with the community!"}
+      </p>
     </motion.div>
   );
 
+  /**
+   * Render error state
+   */
+  const renderErrorState = () => (
+    <Alert variant="destructive">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Error Loading Modes</AlertTitle>
+      <AlertDescription>
+        {error instanceof Error ? error.message : "Failed to load modes from the catalog."}
+      </AlertDescription>
+    </Alert>
+  );
+
+  /**
+   * Render pagination controls
+   */
+  const renderPagination = () => {
+    if (!data?.pagination) return null;
+
+    const { page, totalPages, hasNext, hasPrev } = data.pagination;
+
+    // Calculate page numbers to display
+    const getPageNumbers = (): (number | 'ellipsis')[] => {
+      const pages: (number | 'ellipsis')[] = [];
+      const showPages = 5; // Max number of page buttons to show
+
+      if (totalPages <= showPages) {
+        // Show all pages
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        // Always show first page
+        pages.push(1);
+
+        if (page > 3) {
+          pages.push('ellipsis');
+        }
+
+        // Show pages around current page
+        const start = Math.max(2, page - 1);
+        const end = Math.min(totalPages - 1, page + 1);
+
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+
+        if (page < totalPages - 2) {
+          pages.push('ellipsis');
+        }
+
+        // Always show last page
+        pages.push(totalPages);
+      }
+
+      return pages;
+    };
+
+    const pageNumbers = getPageNumbers();
+
+    return (
+      <Pagination className="mt-8">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={hasPrev ? () => handlePageChange(page - 1) : undefined}
+              className={!hasPrev ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+
+          {pageNumbers.map((pageNum, idx) =>
+            pageNum === 'ellipsis' ? (
+              <PaginationItem key={`ellipsis-${idx}`}>
+                <PaginationEllipsis />
+              </PaginationItem>
+            ) : (
+              <PaginationItem key={pageNum}>
+                <PaginationLink
+                  onClick={() => handlePageChange(pageNum)}
+                  isActive={pageNum === page}
+                  className="cursor-pointer"
+                >
+                  {pageNum}
+                </PaginationLink>
+              </PaginationItem>
+            )
+          )}
+
+          <PaginationItem>
+            <PaginationNext
+              onClick={hasNext ? () => handlePageChange(page + 1) : undefined}
+              className={!hasNext ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="container mx-auto px-4 py-8">
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Community Catalog
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Discover and share custom modes with the community
-          </p>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Badge variant="outline" className="text-muted-foreground">
-            <Globe className="w-3 h-3 mr-1" />
-            Public
-          </Badge>
-        </div>
-      </motion.div>
-
-      {/* Search */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="flex items-center space-x-2 max-w-2xl"
+        className="mb-8"
       >
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Search community modes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-background/50"
+        <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          Community Catalog
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Discover and share custom modes with the community
+        </p>
+      </motion.div>
+
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+        {/* Filters Sidebar */}
+        <aside className="lg:sticky lg:top-8 lg:self-start">
+          <CatalogFilters
+            filters={filters}
+            onChange={handleFilterChange}
           />
-        </div>
-        <Button variant="outline" size="sm">
-          <Filter className="w-4 h-4" />
-        </Button>
-      </motion.div>
+        </aside>
 
-      {/* Featured Modes */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="space-y-6"
-      >
-        <div className="flex items-center space-x-2">
-          <Zap className="w-5 h-5 text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">Featured Modes</h2>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {featuredModes.map((mode, index) => (
-            <ModeCard key={mode.id} mode={mode} index={index} large />
-          ))}
-        </div>
-      </motion.section>
+        {/* Main Content */}
+        <main className="space-y-6">
+          {/* Error State */}
+          {error && renderErrorState()}
 
-      {/* Browse Tabs */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Tabs defaultValue="popular" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
-            <TabsTrigger value="popular">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Popular
-            </TabsTrigger>
-            <TabsTrigger value="recent">
-              <Clock className="w-4 h-4 mr-2" />
-              Recent
-            </TabsTrigger>
-            <TabsTrigger value="top">
-              <Star className="w-4 h-4 mr-2" />
-              Top Rated
-            </TabsTrigger>
-          </TabsList>
+          {/* Loading State */}
+          {isLoading && renderSkeletons()}
 
-          <TabsContent value="popular" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularModes.map((mode, index) => (
-                <ModeCard key={mode.id} mode={mode} index={index} />
-              ))}
-            </div>
-          </TabsContent>
+          {/* Empty State */}
+          {!isLoading && !error && data?.data.length === 0 && renderEmptyState()}
 
-          <TabsContent value="recent" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularModes.slice().reverse().map((mode, index) => (
-                <ModeCard key={mode.id} mode={mode} index={index} />
-              ))}
-            </div>
-          </TabsContent>
+          {/* Modes Grid */}
+          {!isLoading && !error && data && data.data.length > 0 && (
+            <>
+              {/* Results Summary */}
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Showing {((data.pagination.page - 1) * data.pagination.limit) + 1}–
+                  {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} of{' '}
+                  {data.pagination.total} modes
+                </p>
+              </div>
 
-          <TabsContent value="top" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularModes.slice().sort((a, b) => b.rating - a.rating).map((mode, index) => (
-                <ModeCard key={mode.id} mode={mode} index={index} />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </motion.div>
+              {/* Modes Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {data.data.map((mode, index) => (
+                  <motion.div
+                    key={mode.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <ModeCard
+                      mode={mode}
+                      onSelect={(m) => handleModeSelect(m.id)}
+                      onLoad={(m) => handleModeLoad(m.id)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
 
-      {/* Categories */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-6"
-      >
-        <h2 className="text-2xl font-bold text-foreground">Browse by Category</h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: "DAW Control", count: 156, color: "primary" },
-            { name: "Live Performance", count: 89, color: "secondary" },
-            { name: "Mixing & Mastering", count: 134, color: "accent" },
-            { name: "Genre-Specific", count: 201, color: "warning" },
-          ].map((category, index) => (
-            <motion.div
-              key={category.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-            >
-              <Card className="p-4 bg-gradient-surface border-border/50 hover:border-primary/50 transition-all duration-200 cursor-pointer group">
-                <div className="text-center space-y-2">
-                  <div className={`w-12 h-12 mx-auto rounded-lg bg-${category.color}/20 flex items-center justify-center group-hover:bg-${category.color}/30 transition-colors`}>
-                    <div className={`w-6 h-6 bg-${category.color} rounded`} />
-                  </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {category.count} modes
-                  </p>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
+              {/* Pagination */}
+              {data.pagination.totalPages > 1 && renderPagination()}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

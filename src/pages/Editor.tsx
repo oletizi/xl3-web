@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +16,8 @@ import {
   Settings,
   Sliders,
   Volume2,
-  Zap
+  Zap,
+  CloudUpload
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ControllerVisual from "@/components/editor/ControllerVisual";
@@ -28,10 +30,14 @@ import { useLCXL3Device } from "@/contexts/LCXL3Context";
 import { lcxl3ModeToCustomMode, customModeToLCXL3Mode } from "@/utils/modeConverter";
 import { VERSION as LCXL3_VERSION } from "@oletizi/launch-control-xl3";
 import packageJson from "../../package.json";
+import { SaveModeDialog } from "@/components/cloud-storage/SaveModeDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 declare const __BUILD_TIMESTAMP__: string;
 
 const Editor = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [mode, setMode] = useState<CustomMode>(() => {
     const savedMode = loadModeFromStorage();
     if (savedMode) {
@@ -48,6 +54,7 @@ const Editor = () => {
     };
   });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const { device, isConnected: lcxl3Connected, fetchCurrentMode } = useLCXL3Device();
 
   const selectedControlInfo = selectedControl ? getControlInfo(selectedControl) : null;
@@ -186,6 +193,16 @@ const Editor = () => {
     }
   };
 
+  const handleCloudSaveSuccess = (modeId: string) => {
+    toast.success('Mode saved to cloud!', {
+      description: 'You can find it in your library.',
+      action: {
+        label: 'View Library',
+        onClick: () => navigate('/library')
+      }
+    });
+  };
+
   useEffect(() => {
     saveModeToStorage(mode);
   }, [mode]);
@@ -245,6 +262,16 @@ const Editor = () => {
             <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
+          {isAuthenticated && (
+            <Button
+              onClick={() => setSaveDialogOpen(true)}
+              size="sm"
+              className="bg-accent text-accent-foreground shadow-glow-accent"
+            >
+              <CloudUpload className="w-4 h-4 mr-2" />
+              Save to Cloud
+            </Button>
+          )}
         </div>
       </motion.div>
 
@@ -413,6 +440,14 @@ const Editor = () => {
           </Card>
         </motion.div>
       </div>
+
+      {/* Save to Cloud Dialog */}
+      <SaveModeDialog
+        mode={mode}
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        onSuccess={handleCloudSaveSuccess}
+      />
     </div>
   );
 };
