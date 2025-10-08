@@ -33,3 +33,4 @@ test-results
 playwright-report
 .playwright-mcp/
 /playwright-report/
+/.playwright-mcp/
