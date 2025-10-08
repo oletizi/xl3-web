@@ -5,9 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LCXL3Provider } from "@/contexts/LCXL3Context";
 import Layout from "@/components/Layout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Editor from "./pages/Editor";
 import Library from "./pages/Library";
 import Catalog from "./pages/Catalog";
+import { Login } from "./pages/Login";
+import { AuthCallback } from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,9 +23,15 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Layout><Editor /></Layout>} />
-            <Route path="/library" element={<Layout><Library /></Layout>} />
-            <Route path="/catalog" element={<Layout><Catalog /></Layout>} />
+            {/* Authentication routes (no Layout wrapper) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+
+            {/* Protected application routes */}
+            <Route path="/" element={<ProtectedRoute><Layout><Editor /></Layout></ProtectedRoute>} />
+            <Route path="/library" element={<ProtectedRoute><Layout><Library /></Layout></ProtectedRoute>} />
+            <Route path="/catalog" element={<ProtectedRoute><Layout><Catalog /></Layout></ProtectedRoute>} />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<Layout><NotFound /></Layout>} />
           </Routes>

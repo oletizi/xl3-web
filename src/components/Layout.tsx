@@ -12,6 +12,7 @@ import {
   Activity
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { UserProfile } from "@/components/auth/UserProfile";
 
 interface LayoutProps {
   children: ReactNode;
@@ -84,10 +85,12 @@ const Layout = ({ children }: LayoutProps) => {
                 {isConnected ? 'Connected: Launch Control XL3' : (error ? `Error: ${error}` : 'Disconnected')}
               </span>
             </Button>
-            
+
             <Button variant="ghost" size="sm">
               <Settings className="w-4 h-4" />
             </Button>
+
+            <UserProfile />
           </div>
         </div>
       </header>
