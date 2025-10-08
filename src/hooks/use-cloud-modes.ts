@@ -17,6 +17,7 @@ import type {
   PaginatedResponse,
 } from '@/services/cloud-mode-service';
 import type { CustomMode } from '@/types/mode';
+import type { CloudModeMetadata } from '@/types/cloud-mode';
 
 // ============================================================================
 // SERVICE SINGLETON
@@ -177,28 +178,26 @@ export function useModeById(id: string) {
  * Creates a new mode in the database. The mode is initially private.
  * Requires authentication.
  *
- * @returns React Query mutation for creating modes
+ * @returns Object with saveMode async function and isLoading state
  *
  * @example
  * ```tsx
- * function SaveButton({ mode }: { mode: CustomMode }) {
- *   const saveMode = useSaveMode();
+ * function SaveButton({ mode, metadata }: { mode: CustomMode; metadata: CloudModeMetadata }) {
+ *   const { saveMode, isLoading } = useSaveMode();
  *
- *   const handleSave = () => {
- *     saveMode.mutate(mode, {
- *       onSuccess: (savedMode) => {
- *         toast.success(`Mode "${savedMode.name}" saved!`);
- *         navigate(`/modes/${savedMode.id}`);
- *       },
- *       onError: (error) => {
- *         toast.error(`Failed to save: ${error.message}`);
- *       },
- *     });
+ *   const handleSave = async () => {
+ *     try {
+ *       const savedMode = await saveMode({ mode, metadata });
+ *       toast.success(`Mode "${savedMode.name}" saved!`);
+ *       navigate(`/modes/${savedMode.id}`);
+ *     } catch (error) {
+ *       toast.error(`Failed to save: ${error.message}`);
+ *     }
  *   };
  *
  *   return (
- *     <button onClick={handleSave} disabled={saveMode.isPending}>
- *       {saveMode.isPending ? 'Saving...' : 'Save to Cloud'}
+ *     <button onClick={handleSave} disabled={isLoading}>
+ *       {isLoading ? 'Saving...' : 'Save to Cloud'}
  *     </button>
  *   );
  * }
@@ -207,7 +206,7 @@ export function useModeById(id: string) {
 export function useSaveMode() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: (mode: CustomMode) => cloudModeService.saveMode(mode),
     onSuccess: (savedMode) => {
       // Invalidate my modes list to show the new mode
@@ -217,6 +216,13 @@ export function useSaveMode() {
       queryClient.setQueryData(cloudModeKeys.detail(savedMode.id), savedMode);
     },
   });
+
+  return {
+    saveMode: async ({ mode }: { mode: CustomMode; metadata: CloudModeMetadata }): Promise<CloudMode> => {
+      return mutation.mutateAsync(mode);
+    },
+    isLoading: mutation.isPending,
+  };
 }
 
 /**

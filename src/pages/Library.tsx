@@ -84,17 +84,17 @@ const Library = () => {
 
   // Handle loading mode into editor
   const handleLoadMode = (mode: any) => {
-    navigate(`/editor?mode=${mode.id}`);
+    navigate(`/?mode=${mode.id}`);
   };
 
   // Handle editing mode
   const handleEditMode = (mode: any) => {
-    navigate(`/editor?mode=${mode.id}&edit=true`);
+    navigate(`/?mode=${mode.id}&edit=true`);
   };
 
   // Handle creating new mode
   const handleNewMode = () => {
-    navigate("/editor");
+    navigate("/");
   };
 
   // Authentication check
