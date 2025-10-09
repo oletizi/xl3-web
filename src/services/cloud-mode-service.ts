@@ -557,7 +557,7 @@ export class CloudModeService implements ICloudModeService {
     const to = from + limit - 1;
     query = query.range(from, to);
 
-    const { data, error, count } = await query;
+    const { data: modesData, error, count } = await query;
 
     if (error) {
       throw new Error(`Failed to fetch public modes: ${error.message}`);
@@ -566,8 +566,32 @@ export class CloudModeService implements ICloudModeService {
     const total = count || 0;
     const totalPages = Math.ceil(total / limit);
 
+    // Fetch unique author profiles for all modes
+    const authorIds = [...new Set((modesData || []).map(mode => mode.author_id))];
+    const { data: profilesData } = await this.supabase
+      .from('user_profiles')
+      .select('id, screen_name, avatar_url')
+      .in('id', authorIds);
+
+    // Create a map of profiles by id
+    const profilesMap = new Map(
+      (profilesData || []).map(profile => [profile.id, profile])
+    );
+
+    // Merge profile data into modes
+    const modesWithProfiles = (modesData || []).map(row => {
+      const profile = profilesMap.get(row.author_id);
+      return this.toCloudMode({
+        ...row,
+        user_profiles: profile ? {
+          screen_name: profile.screen_name,
+          avatar_url: profile.avatar_url,
+        } : null,
+      } as any);
+    });
+
     return {
-      data: (data || []).map((row) => this.toCloudMode(row as ModeRow)),
+      data: modesWithProfiles,
       pagination: {
         page,
         limit,
