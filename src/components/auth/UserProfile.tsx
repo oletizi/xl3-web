@@ -33,6 +33,10 @@ export function UserProfile() {
     }
   };
 
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
   const avatarUrl = user.user_metadata?.avatar_url;
   const fullName = user.user_metadata?.full_name || user.email;
   const email = user.email;
@@ -71,6 +75,13 @@ export function UserProfile() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={handleProfileClick}
+          className="cursor-pointer"
+        >
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleSignOut}
           disabled={signingOut}
