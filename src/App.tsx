@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Editor from "./pages/Editor";
 import Library from "./pages/Library";
 import Catalog from "./pages/Catalog";
+import ModeDetail from "./pages/ModeDetail";
 import { Login } from "./pages/Login";
 import { AuthCallback } from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Layout><Editor /></Layout></ProtectedRoute>} />
             <Route path="/library" element={<ProtectedRoute><Layout><Library /></Layout></ProtectedRoute>} />
             <Route path="/catalog" element={<ProtectedRoute><Layout><Catalog /></Layout></ProtectedRoute>} />
+            <Route path="/modes/:id" element={<ProtectedRoute><Layout><ModeDetail /></Layout></ProtectedRoute>} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<Layout><NotFound /></Layout>} />
