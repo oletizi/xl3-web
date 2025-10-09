@@ -250,10 +250,19 @@ export class CloudModeService implements ICloudModeService {
    * @param row - Database row from Supabase
    * @returns CloudMode object
    */
-  private toCloudMode(row: ModeRow): CloudMode {
+  private toCloudMode(row: any): CloudMode {
+    // Extract author profile if available
+    const profile = row.user_profiles;
+    const author = profile ? {
+      id: row.author_id,
+      screenName: profile.screen_name,
+      avatarUrl: profile.avatar_url || undefined,
+    } : undefined;
+
     return {
       id: row.id,
       authorId: row.author_id,
+      author,
       name: row.name,
       description: row.description || '',
       version: row.version,
@@ -341,17 +350,29 @@ export class CloudModeService implements ICloudModeService {
   async getMyModes(): Promise<CloudMode[]> {
     const userId = await this.getCurrentUserId();
 
-    const { data, error } = await this.supabase
+    // Fetch modes
+    const { data: modesData, error: modesError } = await this.supabase
       .from('modes')
       .select('*')
       .eq('author_id', userId)
       .order('modified_at', { ascending: false });
 
-    if (error) {
-      throw new Error(`Failed to fetch user modes: ${error.message}`);
+    if (modesError) {
+      throw new Error(`Failed to fetch user modes: ${modesError.message}`);
     }
 
-    return (data || []).map((row) => this.toCloudMode(row as ModeRow));
+    // Fetch user profile
+    const { data: profileData } = await this.supabase
+      .from('user_profiles')
+      .select('screen_name, avatar_url')
+      .eq('id', userId)
+      .single();
+
+    // Merge profile data into modes
+    return (modesData || []).map((row) => this.toCloudMode({
+      ...row,
+      user_profiles: profileData || null,
+    } as any));
   }
 
   /**
@@ -361,6 +382,7 @@ export class CloudModeService implements ICloudModeService {
    * @returns Cloud mode or null if not found
    */
   async getModeById(id: string): Promise<CloudMode | null> {
+    // Fetch mode
     const { data, error } = await this.supabase
       .from('modes')
       .select('*')
@@ -379,7 +401,17 @@ export class CloudModeService implements ICloudModeService {
       return null;
     }
 
-    return this.toCloudMode(data as ModeRow);
+    // Fetch author profile
+    const { data: profileData } = await this.supabase
+      .from('user_profiles')
+      .select('screen_name, avatar_url')
+      .eq('id', data.author_id)
+      .single();
+
+    return this.toCloudMode({
+      ...data,
+      user_profiles: profileData || null,
+    } as any);
   }
 
   /**

@@ -122,8 +122,7 @@ export interface CloudMode extends CustomMode {
  */
 export interface CloudModeAuthor {
   id: string;
-  email: string;
-  displayName?: string;
+  screenName: string;
   avatarUrl?: string;
 }
 

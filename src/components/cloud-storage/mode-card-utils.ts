@@ -28,16 +28,16 @@ export function formatCategory(category: string | undefined): string {
  * @param email - User's email address
  * @returns Two-character initials
  */
-export function getInitials(name: string | undefined, email: string): string {
-  if (name) {
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
+export function getInitials(screenName: string | undefined): string {
+  if (!screenName) {
+    return '??';
   }
 
-  return email.slice(0, 2).toUpperCase();
+  const parts = screenName.split(/[\s_-]+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return screenName.slice(0, 2).toUpperCase();
 }
 
 /**

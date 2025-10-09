@@ -99,7 +99,7 @@ const ModeDetail = () => {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <User className="w-4 h-4" />
-                {mode.author?.name || "Unknown Author"}
+                {mode.author?.screenName || "Unknown Author"}
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />

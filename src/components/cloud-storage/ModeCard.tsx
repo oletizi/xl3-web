@@ -359,13 +359,13 @@ export function ModeCard({
         {/* Author information */}
         <div className="flex items-center gap-2 mt-2">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={mode.author?.avatarUrl} alt={mode.author?.displayName} />
+            <AvatarImage src={mode.author?.avatarUrl} alt={mode.author?.screenName} />
             <AvatarFallback className="text-xs">
-              {getInitials(mode.author?.displayName, mode.author?.email || '')}
+              {getInitials(mode.author?.screenName)}
             </AvatarFallback>
           </Avatar>
           <span className="text-sm text-muted-foreground">
-            {mode.author?.displayName || mode.author?.email || 'Unknown Author'}
+            {mode.author?.screenName || 'Unknown Author'}
           </span>
         </div>
       </CardHeader>
