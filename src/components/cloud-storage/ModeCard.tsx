@@ -158,8 +158,8 @@ export function ModeCard({
 
     if (onLoad) {
       onLoad(mode);
-      toast.success('Mode Loaded', {
-        description: `${mode.name} is now active on your controller.`,
+      toast.success('Opening in Editor', {
+        description: `${mode.name} is ready to edit.`,
       });
     }
   };

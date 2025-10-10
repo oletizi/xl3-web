@@ -39,7 +39,7 @@ const Catalog = () => {
    * Handle mode load (apply to editor)
    */
   const handleModeLoad = (mode: any) => {
-    navigate(`/editor?mode=${mode.id}`);
+    navigate(`/?mode=${mode.id}`);
   };
 
   // Custom empty state message
