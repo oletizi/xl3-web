@@ -43,17 +43,36 @@ export function SlotSelector({
         </Button>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {slotNames.map((name, index) => (
-          <SlotCard
-            key={index}
-            slotIndex={index}
-            slotName={name}
-            isActive={index === activeSlotIndex}
-            syncStatus={index === activeSlotIndex ? syncStatus : 'unknown'}
-            onClick={() => onSlotSelect(index)}
-          />
-        ))}
+      <div className="space-y-2">
+        {/* First row: slots 0-7 */}
+        <div className="flex gap-2">
+          {slotNames.slice(0, 8).map((name, index) => (
+            <div key={index} className="flex-1 min-w-0">
+              <SlotCard
+                slotIndex={index}
+                slotName={name}
+                isActive={index === activeSlotIndex}
+                syncStatus={index === activeSlotIndex ? syncStatus : 'unknown'}
+                onClick={() => onSlotSelect(index)}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Second row: slots 8-14 */}
+        <div className="flex gap-2">
+          {slotNames.slice(8, 15).map((name, index) => (
+            <div key={index + 8} className="flex-1 min-w-0">
+              <SlotCard
+                slotIndex={index + 8}
+                slotName={name}
+                isActive={index + 8 === activeSlotIndex}
+                syncStatus={index + 8 === activeSlotIndex ? syncStatus : 'unknown'}
+                onClick={() => onSlotSelect(index + 8)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

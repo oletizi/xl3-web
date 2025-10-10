@@ -41,7 +41,7 @@ export function SlotCard({
       aria-label={`Slot ${slotIndex}: ${slotName}${isActive ? ' (active)' : ''}`}
       className={cn(
         'flex flex-col items-center justify-center p-3 cursor-pointer',
-        'min-w-[80px] transition-all hover:shadow-md',
+        'transition-all hover:shadow-md',
         'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
         isActive && 'ring-2 ring-primary shadow-glow-primary'
       )}
