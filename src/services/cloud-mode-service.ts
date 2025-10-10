@@ -204,7 +204,7 @@ export interface ICloudModeService {
   /**
    * Get public modes with pagination and filters
    */
-  getPublicModes(options: PaginationOptions): Promise<PaginatedResponse<CloudMode>>;
+  getPublicModes(options: ModeFilters): Promise<PaginatedResponse<CloudMode>>;
 
   /**
    * Like a mode (toggle)
@@ -355,7 +355,7 @@ export class CloudModeService implements ICloudModeService {
       .from('modes')
       .select('*')
       .eq('author_id', userId)
-      .order('modified_at', { ascending: false });
+      .order('modified_at', { ascending: false});
 
     if (modesError) {
       throw new Error(`Failed to fetch user modes: ${modesError.message}`);
@@ -368,11 +368,29 @@ export class CloudModeService implements ICloudModeService {
       .eq('id', userId)
       .single();
 
-    // Merge profile data into modes
-    return (modesData || []).map((row) => this.toCloudMode({
-      ...row,
-      user_profiles: profileData || null,
-    } as any));
+    // Fetch all likes for current user for these modes
+    const modeIds = (modesData || []).map(mode => mode.id);
+    const { data: likesData } = await this.supabase
+      .from('mode_likes')
+      .select('mode_id')
+      .eq('user_id', userId)
+      .in('mode_id', modeIds);
+
+    // Create a set of liked mode IDs for quick lookup
+    const likedModeIds = new Set((likesData || []).map(like => like.mode_id));
+
+    // Merge profile data and like status into modes
+    return (modesData || []).map((row) => {
+      const cloudMode = this.toCloudMode({
+        ...row,
+        user_profiles: profileData || null,
+      } as any);
+
+      // Add userLiked field
+      cloudMode.userLiked = likedModeIds.has(row.id);
+
+      return cloudMode;
+    });
   }
 
   /**
@@ -523,13 +541,13 @@ export class CloudModeService implements ICloudModeService {
   /**
    * Get public modes with pagination and filters
    *
-   * @param options - Pagination options
+   * @param options - Filter and pagination options
    * @returns Paginated response with cloud modes
    */
   async getPublicModes(
-    options: PaginationOptions = {}
+    options: ModeFilters = {}
   ): Promise<PaginatedResponse<CloudMode>> {
-    const { page = 1, limit = 20, sort = 'recent' } = options;
+    const { page = 1, limit = 20, sort = 'recent', showLikedOnly } = options;
 
     let query = this.supabase
       .from('modes')
@@ -578,26 +596,56 @@ export class CloudModeService implements ICloudModeService {
       (profilesData || []).map(profile => [profile.id, profile])
     );
 
-    // Merge profile data into modes
-    const modesWithProfiles = (modesData || []).map(row => {
+    // Fetch current user's likes for these modes (if authenticated)
+    let likedModeIds = new Set<string>();
+    try {
+      const userId = await this.getCurrentUserId();
+      const modeIds = (modesData || []).map(mode => mode.id);
+      const { data: likesData } = await this.supabase
+        .from('mode_likes')
+        .select('mode_id')
+        .eq('user_id', userId)
+        .in('mode_id', modeIds);
+
+      likedModeIds = new Set((likesData || []).map(like => like.mode_id));
+    } catch {
+      // User not authenticated, skip likes fetching
+    }
+
+    // Merge profile data and like status into modes
+    let modesWithProfiles = (modesData || []).map(row => {
       const profile = profilesMap.get(row.author_id);
-      return this.toCloudMode({
+      const cloudMode = this.toCloudMode({
         ...row,
         user_profiles: profile ? {
           screen_name: profile.screen_name,
           avatar_url: profile.avatar_url,
         } : null,
       } as any);
+
+      // Add userLiked field
+      cloudMode.userLiked = likedModeIds.has(row.id);
+
+      return cloudMode;
     });
+
+    // Apply liked-only filter if requested
+    if (showLikedOnly) {
+      modesWithProfiles = modesWithProfiles.filter(mode => mode.userLiked === true);
+    }
+
+    // Recalculate pagination after filtering
+    const filteredTotal = modesWithProfiles.length;
+    const filteredTotalPages = Math.ceil(filteredTotal / limit);
 
     return {
       data: modesWithProfiles,
       pagination: {
         page,
         limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
+        total: filteredTotal,
+        totalPages: filteredTotalPages,
+        hasNext: page < filteredTotalPages,
         hasPrev: page > 1,
       },
     };

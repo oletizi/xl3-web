@@ -210,6 +210,17 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   };
 
   /**
+   * Handle liked only toggle
+   */
+  const handleLikedToggle = (checked: boolean) => {
+    onChange({
+      ...filters,
+      showLikedOnly: checked || undefined,
+      page: 1, // Reset to first page
+    });
+  };
+
+  /**
    * Handle items per page change
    */
   const handleLimitChange = (value: string) => {
@@ -242,6 +253,7 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
     if (filters.category) count++;
     if (filters.tags && filters.tags.length > 0) count++;
     if (filters.isFeatured) count++;
+    if (filters.showLikedOnly) count++;
     return count;
   }, [filters]);
 
@@ -372,6 +384,18 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           id="featured"
           checked={filters.isFeatured || false}
           onCheckedChange={handleFeaturedToggle}
+        />
+      </div>
+
+      {/* Liked Only Toggle */}
+      <div className="flex items-center justify-between space-x-2">
+        <Label htmlFor="liked-only" className="cursor-pointer">
+          Show Liked Only
+        </Label>
+        <Switch
+          id="liked-only"
+          checked={filters.showLikedOnly || false}
+          onCheckedChange={handleLikedToggle}
         />
       </div>
 

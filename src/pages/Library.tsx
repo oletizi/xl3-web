@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Search,
   Grid,
@@ -16,7 +18,8 @@ import {
   RefreshCw,
   SortAsc,
   SortDesc,
-  Calendar
+  Calendar,
+  Heart
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useMyModes } from "@/hooks/use-cloud-modes";
@@ -40,12 +43,18 @@ const Library = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("recent");
+  const [showLikedOnly, setShowLikedOnly] = useState(false);
 
   // Filter and sort modes based on search query and sort option
   const filteredAndSortedModes = useMemo(() => {
     if (!modes) return [];
 
     let result = [...modes];
+
+    // Apply liked filter
+    if (showLikedOnly) {
+      result = result.filter((mode) => mode.userLiked === true);
+    }
 
     // Apply search filter
     if (searchQuery.trim()) {
@@ -80,7 +89,7 @@ const Library = () => {
     });
 
     return result;
-  }, [modes, searchQuery, sortBy]);
+  }, [modes, searchQuery, sortBy, showLikedOnly]);
 
   // Handle loading mode into editor
   const handleLoadMode = (mode: any) => {
@@ -269,6 +278,19 @@ const Library = () => {
         </div>
 
         <div className="flex items-center space-x-2">
+          {/* Show Liked Only toggle */}
+          <div className="flex items-center space-x-2 px-3 py-2 border border-border rounded-lg">
+            <Heart className={`w-4 h-4 ${showLikedOnly ? 'fill-current text-primary' : 'text-muted-foreground'}`} />
+            <Label htmlFor="liked-only" className="cursor-pointer text-sm">
+              Liked
+            </Label>
+            <Switch
+              id="liked-only"
+              checked={showLikedOnly}
+              onCheckedChange={setShowLikedOnly}
+            />
+          </div>
+
           {/* Sort selector */}
           <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
             <SelectTrigger className="w-40">

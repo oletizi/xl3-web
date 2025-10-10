@@ -379,6 +379,9 @@ export interface ModeFilters {
   /** Filter featured modes only */
   isFeatured?: boolean;
 
+  /** Show only modes liked by current user */
+  showLikedOnly?: boolean;
+
   /** Sort order */
   sort?: ModeSortOption;
 
