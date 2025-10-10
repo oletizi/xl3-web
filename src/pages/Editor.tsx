@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Play,
-  Save,
   Download,
   Upload,
   RotateCcw,
@@ -17,7 +16,8 @@ import {
   Sliders,
   Volume2,
   Zap,
-  CloudUpload
+  CloudUpload,
+  ArrowDownToLine
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ControllerVisual from "@/components/editor/ControllerVisual";
@@ -236,7 +236,7 @@ const Editor = () => {
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
-          <Button variant="outline" size="sm">
+          <Button onClick={handleSave} variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -246,7 +246,7 @@ const Editor = () => {
             size="sm"
             className="bg-accent text-accent-foreground shadow-glow-accent"
           >
-            <Download className="w-4 h-4 mr-2" />
+            <ArrowDownToLine className="w-4 h-4 mr-2" />
             Fetch
           </Button>
           <Button
@@ -257,10 +257,6 @@ const Editor = () => {
           >
             <Play className="w-4 h-4 mr-2" />
             Send
-          </Button>
-          <Button onClick={handleSave} size="sm" className="bg-primary text-primary-foreground shadow-glow-primary">
-            <Save className="w-4 h-4 mr-2" />
-            Save
           </Button>
           {isAuthenticated && (
             <Button
