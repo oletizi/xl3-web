@@ -209,9 +209,12 @@ const Editor = () => {
 
     try {
       setSyncStatus('syncing');
+      console.log('[handleSend] activeSlotIndex:', activeSlotIndex);
+      console.log('[handleSend] typeof activeSlotIndex:', typeof activeSlotIndex);
       toast.info(`Sending mode to slot ${activeSlotIndex}...`);
 
       const lcxl3Mode = customModeToLCXL3Mode(mode);
+      console.log('[handleSend] Calling device.saveCustomMode with slot:', activeSlotIndex);
       await device.saveCustomMode(activeSlotIndex, lcxl3Mode);
 
       setSyncStatus('synced');
@@ -254,8 +257,11 @@ const Editor = () => {
 
   // Handle slot selection
   const handleSlotSelect = async (index: number) => {
+    console.log('[handleSlotSelect] Selecting slot:', index);
+    console.log('[handleSlotSelect] typeof index:', typeof index);
     setActiveSlotIndex(index);
     saveActiveSlot(index);
+    console.log('[handleSlotSelect] activeSlotIndex state updated to:', index);
 
     // Check sync status for new slot
     if (device && lcxl3Connected) {
