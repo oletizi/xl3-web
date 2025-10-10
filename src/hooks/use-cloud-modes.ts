@@ -488,6 +488,10 @@ export function useLikeMode() {
     onSettled: (data, error, { modeId }) => {
       // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: cloudModeKeys.detail(modeId) });
+
+      // Invalidate lists to update like counts in library and catalog
+      queryClient.invalidateQueries({ queryKey: cloudModeKeys.myModes() });
+      queryClient.invalidateQueries({ queryKey: cloudModeKeys.publicModes({}) });
     },
   });
 }

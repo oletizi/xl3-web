@@ -612,11 +612,16 @@ export class CloudModeService implements ICloudModeService {
     const userId = await this.getCurrentUserId();
 
     // Check if already liked
-    const { data: existingLike } = await this.supabase
+    const { data: existingLike, error: checkError } = await this.supabase
       .from('mode_likes')
       .select('*')
       .match({ user_id: userId, mode_id: modeId })
-      .single();
+      .maybeSingle();
+
+    // Ignore PGRST116 (no rows found) error
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw new Error(`Failed to check like status: ${checkError.message}`);
+    }
 
     if (existingLike) {
       // Already liked, do nothing (unlikeMode should be called instead)
