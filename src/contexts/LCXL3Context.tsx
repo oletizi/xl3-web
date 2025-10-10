@@ -9,6 +9,7 @@ interface LCXL3ContextType {
   isInitialized: boolean;
   error: string | null;
   fetchCurrentMode: () => Promise<LCXL3CustomMode>;
+  fetchAllSlotNames: () => Promise<string[]>;
 }
 
 const LCXL3Context = createContext<LCXL3ContextType | undefined>(undefined);

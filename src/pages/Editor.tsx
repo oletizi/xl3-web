@@ -21,11 +21,15 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ControllerVisual from "@/components/editor/ControllerVisual";
+import { SlotSelector } from "@/components/editor/SlotSelector";
 import { CustomMode, ControlMapping } from "@/types/mode";
 import { saveMode, loadMode } from "@/utils/fileStorage";
 import { toast } from "sonner";
 import { initializeDefaultControls, getControlInfo } from "@/utils/controlMetadata";
 import { loadModeFromStorage, saveModeToStorage, clearModeFromStorage } from "@/utils/statePersistence";
+import { saveActiveSlot, loadActiveSlot, saveSlotNames, loadSlotNames } from "@/utils/slotPersistence";
+import { checkSlotSync } from "@/utils/syncDetection";
+import type { SyncStatus } from "@/utils/syncDetection";
 import { useLCXL3Device } from "@/contexts/LCXL3Context";
 import { lcxl3ModeToCustomMode, customModeToLCXL3Mode } from "@/utils/modeConverter";
 import { VERSION as LCXL3_VERSION } from "@oletizi/launch-control-xl3";
@@ -59,7 +63,14 @@ const Editor = () => {
   });
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const { device, isConnected: lcxl3Connected, fetchCurrentMode } = useLCXL3Device();
+  const [activeSlotIndex, setActiveSlotIndex] = useState<number>(() => loadActiveSlot());
+  const [slotNames, setSlotNames] = useState<string[]>(() => {
+    const cached = loadSlotNames();
+    return cached || Array.from({ length: 15 }, (_, i) => `Slot ${i}`);
+  });
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('unknown');
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const { device, isConnected: lcxl3Connected, fetchCurrentMode, fetchAllSlotNames } = useLCXL3Device();
 
   // Fetch mode from cloud if ID is in query params
   const { data: cloudMode, isLoading: isLoadingCloudMode } = useModeById(
@@ -136,10 +147,16 @@ const Editor = () => {
   };
 
   const handleFetch = async () => {
-    try {
-      toast.info('Fetching mode from device...');
+    if (!device) {
+      toast.error('Device not connected');
+      return;
+    }
 
-      const lcxl3Mode = await fetchCurrentMode();
+    try {
+      setSyncStatus('syncing');
+      toast.info(`Fetching mode from slot ${activeSlotIndex}...`);
+
+      const lcxl3Mode = await device.loadCustomMode(activeSlotIndex);
       console.log('Raw mode from device:', lcxl3Mode);
       console.log('Controls array:', lcxl3Mode.controls);
 
@@ -174,8 +191,10 @@ const Editor = () => {
         controls: mergedControls
       });
 
-      toast.success('Mode fetched successfully from device!');
+      setSyncStatus('synced');
+      toast.success(`Mode fetched successfully from slot ${activeSlotIndex}!`);
     } catch (error) {
+      setSyncStatus('unknown');
       const message = error instanceof Error ? error.message : 'Failed to fetch mode';
       toast.error(`Fetch failed: ${message}`);
       console.error('Fetch error:', error);
@@ -189,13 +208,16 @@ const Editor = () => {
     }
 
     try {
-      toast.info('Sending mode to device...');
+      setSyncStatus('syncing');
+      toast.info(`Sending mode to slot ${activeSlotIndex}...`);
 
       const lcxl3Mode = customModeToLCXL3Mode(mode);
-      await device.saveCustomMode(0, lcxl3Mode);
+      await device.saveCustomMode(activeSlotIndex, lcxl3Mode);
 
-      toast.success('Mode sent successfully to device!');
+      setSyncStatus('synced');
+      toast.success(`Mode sent successfully to slot ${activeSlotIndex}!`);
     } catch (error) {
+      setSyncStatus('unknown');
       const message = error instanceof Error ? error.message : 'Failed to send mode';
       toast.error(`Send failed: ${message}`);
       console.error('Send error:', error);
@@ -210,6 +232,42 @@ const Editor = () => {
         onClick: () => navigate('/library')
       }
     });
+  };
+
+  // Fetch all slot names from device
+  const handleRefreshSlots = async () => {
+    if (!device || !lcxl3Connected) return;
+
+    setIsLoadingSlots(true);
+    try {
+      const names = await fetchAllSlotNames();
+      setSlotNames(names);
+      saveSlotNames(names);
+      toast.success('Slot names refreshed');
+    } catch (error) {
+      toast.error('Failed to fetch slot names');
+      console.error(error);
+    } finally {
+      setIsLoadingSlots(false);
+    }
+  };
+
+  // Handle slot selection
+  const handleSlotSelect = async (index: number) => {
+    setActiveSlotIndex(index);
+    saveActiveSlot(index);
+
+    // Check sync status for new slot
+    if (device && lcxl3Connected) {
+      try {
+        setSyncStatus('syncing');
+        const deviceMode = await device.loadCustomMode(index);
+        const isSync = await checkSlotSync(mode, deviceMode);
+        setSyncStatus(isSync ? 'synced' : 'modified');
+      } catch {
+        setSyncStatus('unknown');
+      }
+    }
   };
 
   // Effect to load cloud mode when fetched from query parameter
@@ -237,7 +295,17 @@ const Editor = () => {
 
   useEffect(() => {
     saveModeToStorage(mode);
-  }, [mode]);
+
+    // Mark as modified when buffer changes (unless we just fetched/sent)
+    // Small delay to avoid race condition with fetch/send
+    const timeoutId = setTimeout(() => {
+      if (syncStatus === 'synced') {
+        setSyncStatus('modified');
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [mode, syncStatus]);
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -306,6 +374,24 @@ const Editor = () => {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Main Editor Area */}
         <div className="xl:col-span-3 space-y-6">
+          {/* Slot Selector */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="p-6 bg-gradient-surface border-border/50">
+              <SlotSelector
+                slotNames={slotNames}
+                activeSlotIndex={activeSlotIndex}
+                syncStatus={syncStatus}
+                onSlotSelect={handleSlotSelect}
+                onRefreshSlots={handleRefreshSlots}
+                isLoadingSlots={isLoadingSlots}
+                isDeviceConnected={lcxl3Connected}
+              />
+            </Card>
+          </motion.div>
+
           {/* Controller Visual */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

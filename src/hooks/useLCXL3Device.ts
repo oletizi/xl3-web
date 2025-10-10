@@ -364,8 +364,30 @@ export function useLCXL3Device() {
     return mode;
   };
 
+  const fetchAllSlotNames = async (): Promise<string[]> => {
+    if (!state.device || !state.isConnected) {
+      throw new Error('Device not connected');
+    }
+
+    const names: string[] = [];
+
+    // Load each slot and extract its name
+    for (let i = 0; i < 15; i++) {
+      try {
+        const mode = await state.device.loadCustomMode(i);
+        names.push(mode.name || `Slot ${i}`);
+      } catch (error) {
+        console.warn(`Failed to load slot ${i}:`, error);
+        names.push(`---`); // Empty slot indicator
+      }
+    }
+
+    return names;
+  };
+
   return {
     ...state,
-    fetchCurrentMode
+    fetchCurrentMode,
+    fetchAllSlotNames
   };
 }
