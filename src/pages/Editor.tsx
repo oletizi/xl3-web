@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,12 +32,16 @@ import { VERSION as LCXL3_VERSION } from "@oletizi/launch-control-xl3";
 import packageJson from "../../package.json";
 import { SaveModeDialog } from "@/components/cloud-storage/SaveModeDialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { useModeById } from "@/hooks/use-cloud-modes";
 
 declare const __BUILD_TIMESTAMP__: string;
 
 const Editor = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const modeIdParam = searchParams.get('mode');
+
   const [mode, setMode] = useState<CustomMode>(() => {
     const savedMode = loadModeFromStorage();
     if (savedMode) {
@@ -56,6 +60,11 @@ const Editor = () => {
   const [selectedControl, setSelectedControl] = useState<string | null>(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const { device, isConnected: lcxl3Connected, fetchCurrentMode } = useLCXL3Device();
+
+  // Fetch mode from cloud if ID is in query params
+  const { data: cloudMode, isLoading: isLoadingCloudMode } = useModeById(
+    modeIdParam || ''
+  );
 
   const selectedControlInfo = selectedControl ? getControlInfo(selectedControl) : null;
   const selectedControlMapping = selectedControl ? mode.controls[selectedControl] : null;
@@ -202,6 +211,29 @@ const Editor = () => {
       }
     });
   };
+
+  // Effect to load cloud mode when fetched from query parameter
+  useEffect(() => {
+    if (cloudMode && modeIdParam) {
+      // Convert CloudMode to CustomMode format for editor
+      setMode({
+        name: cloudMode.name,
+        description: cloudMode.description || '',
+        version: cloudMode.version,
+        controls: cloudMode.controls,
+        createdAt: cloudMode.createdAt,
+        modifiedAt: cloudMode.modifiedAt,
+      });
+
+      // Clear the query parameter after loading
+      setSearchParams({});
+
+      // Show success toast
+      toast.success('Mode loaded', {
+        description: `${cloudMode.name} is ready to edit.`,
+      });
+    }
+  }, [cloudMode, modeIdParam, setSearchParams]);
 
   useEffect(() => {
     saveModeToStorage(mode);
