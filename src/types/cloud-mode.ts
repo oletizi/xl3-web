@@ -359,6 +359,23 @@ export interface CloudModeMetadata {
 }
 
 /**
+ * Filter options for browsing user's library
+ */
+export interface LibraryFilters {
+  /** Full-text search query */
+  search?: string;
+
+  /** Sort order */
+  sort?: 'recent' | 'oldest' | 'name-asc' | 'name-desc' | 'likes' | 'downloads';
+
+  /** Show only modes liked by current user */
+  showLikedOnly?: boolean;
+
+  /** Display mode (grid or list) */
+  viewMode?: 'grid' | 'list';
+}
+
+/**
  * Filter and query options for browsing modes
  *
  * Used to build database queries with filtering, sorting, and pagination.

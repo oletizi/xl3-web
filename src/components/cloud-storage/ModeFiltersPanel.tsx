@@ -1,16 +1,23 @@
 /**
- * CatalogFilters Component
+ * ModeFiltersPanel Component
  *
- * Provides comprehensive filtering and sorting controls for the public mode catalog.
- * Features include search, category selection, tag filtering, sorting options,
- * featured toggle, and pagination controls.
+ * A generic, reusable filter sidebar that adapts to Library or Catalog context.
+ * Provides comprehensive filtering and sorting controls with variant-based rendering.
  *
- * @module components/cloud-storage/CatalogFilters
+ * Features:
+ * - Variant support: 'library' | 'catalog'
+ * - Debounced search input
+ * - Active filter count badge
+ * - Clear all functionality
+ * - Responsive: desktop sidebar, mobile accordion
+ * - Accessibility: proper labels, keyboard navigation
+ *
+ * @module components/cloud-storage/ModeFiltersPanel
  */
 
 import * as React from 'react';
-import { Search, X, Filter, ChevronDown } from 'lucide-react';
-import { ModeFilters, ModeCategory, ModeSortOption } from '@/types/cloud-mode';
+import { Search, X, Filter } from 'lucide-react';
+import { LibraryFilters, ModeFilters, ModeCategory, ModeSortOption } from '@/types/cloud-mode';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,9 +55,9 @@ const CATEGORIES: Array<{ value: ModeCategory; label: string }> = [
 ];
 
 /**
- * Available sort options with display labels
+ * Available sort options for catalog
  */
-const SORT_OPTIONS: Array<{ value: ModeSortOption; label: string }> = [
+const CATALOG_SORT_OPTIONS: Array<{ value: ModeSortOption; label: string }> = [
   { value: 'recent', label: 'Newest First' },
   { value: 'downloads', label: 'Most Downloaded' },
   { value: 'likes', label: 'Most Liked' },
@@ -59,7 +66,19 @@ const SORT_OPTIONS: Array<{ value: ModeSortOption; label: string }> = [
 ];
 
 /**
- * Available items-per-page options
+ * Available sort options for library
+ */
+const LIBRARY_SORT_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'recent', label: 'Newest First' },
+  { value: 'oldest', label: 'Oldest First' },
+  { value: 'name-asc', label: 'Name (A-Z)' },
+  { value: 'name-desc', label: 'Name (Z-A)' },
+  { value: 'likes', label: 'Most Liked' },
+  { value: 'downloads', label: 'Most Downloaded' },
+];
+
+/**
+ * Available items-per-page options (catalog only)
  */
 const ITEMS_PER_PAGE_OPTIONS = [12, 24, 48] as const;
 
@@ -72,12 +91,15 @@ const SEARCH_DEBOUNCE_DELAY = 500;
 // INTERFACES
 // ============================================================================
 
-export interface CatalogFiltersProps {
+export interface ModeFiltersPanelProps {
   /** Current filter state */
-  filters: ModeFilters;
+  filters: LibraryFilters | ModeFilters;
 
   /** Callback when filters change */
-  onChange: (filters: ModeFilters) => void;
+  onChange: (filters: LibraryFilters | ModeFilters) => void;
+
+  /** Context variant: library or catalog */
+  variant: 'library' | 'catalog';
 
   /** Additional CSS classes */
   className?: string;
@@ -91,34 +113,50 @@ export interface CatalogFiltersProps {
 // ============================================================================
 
 /**
- * CatalogFilters provides a comprehensive filtering interface for browsing modes.
+ * ModeFiltersPanel provides a comprehensive filtering interface for browsing modes.
  *
- * Features:
- * - Debounced search input
- * - Category selection
- * - Tag filtering
- * - Sort options
- * - Featured toggle
- * - Pagination controls
- * - Responsive design with mobile accordion
- * - Active filter count badge
- * - Clear all functionality
+ * Adapts its UI based on the variant prop:
+ * - Library: Shows search, sort, liked toggle
+ * - Catalog: Shows search, category, tags, sort, featured, liked, pagination
+ *
+ * @example
+ * ```tsx
+ * // Library usage
+ * <ModeFiltersPanel
+ *   variant="library"
+ *   filters={libraryFilters}
+ *   onChange={setLibraryFilters}
+ * />
+ *
+ * // Catalog usage
+ * <ModeFiltersPanel
+ *   variant="catalog"
+ *   filters={catalogFilters}
+ *   onChange={setCatalogFilters}
+ * />
+ * ```
  */
-export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
+export const ModeFiltersPanel: React.FC<ModeFiltersPanelProps> = ({
   filters,
   onChange,
+  variant,
   className,
   defaultCollapsed = true,
 }) => {
   // Local state for search input (debounced)
   const [searchValue, setSearchValue] = React.useState(filters.search || '');
   const [tagsValue, setTagsValue] = React.useState(
-    filters.tags?.join(', ') || ''
+    'tags' in filters && filters.tags ? filters.tags.join(', ') : ''
   );
 
-  // Debounce timer ref
+  // Debounce timer refs
   const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const tagsTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Type guards
+  const isCatalogFilters = (f: LibraryFilters | ModeFilters): f is ModeFilters => {
+    return variant === 'catalog';
+  };
 
   // Sync local search state with prop changes
   React.useEffect(() => {
@@ -127,8 +165,10 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
   // Sync local tags state with prop changes
   React.useEffect(() => {
-    setTagsValue(filters.tags?.join(', ') || '');
-  }, [filters.tags]);
+    if ('tags' in filters) {
+      setTagsValue(filters.tags?.join(', ') || '');
+    }
+  }, [filters]);
 
   /**
    * Handle search input with debouncing
@@ -146,13 +186,13 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
       onChange({
         ...filters,
         search: value.trim() || undefined,
-        page: 1, // Reset to first page on search
+        ...(variant === 'catalog' && { page: 1 }), // Reset to first page on search in catalog
       });
     }, SEARCH_DEBOUNCE_DELAY);
   };
 
   /**
-   * Handle tags input with debouncing
+   * Handle tags input with debouncing (catalog only)
    */
   const handleTagsChange = (value: string) => {
     setTagsValue(value);
@@ -169,44 +209,57 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0);
 
-      onChange({
-        ...filters,
-        tags: tags.length > 0 ? tags : undefined,
-        page: 1, // Reset to first page on tags change
-      });
+      if (isCatalogFilters(filters)) {
+        onChange({
+          ...filters,
+          tags: tags.length > 0 ? tags : undefined,
+          page: 1, // Reset to first page
+        });
+      }
     }, SEARCH_DEBOUNCE_DELAY);
   };
 
   /**
-   * Handle category selection
+   * Handle category selection (catalog only)
    */
   const handleCategoryChange = (value: string) => {
-    onChange({
-      ...filters,
-      category: value === 'all' ? undefined : (value as ModeCategory),
-      page: 1, // Reset to first page
-    });
+    if (isCatalogFilters(filters)) {
+      onChange({
+        ...filters,
+        category: value === 'all' ? undefined : (value as ModeCategory),
+        page: 1, // Reset to first page
+      });
+    }
   };
 
   /**
    * Handle sort option change
    */
   const handleSortChange = (value: string) => {
-    onChange({
-      ...filters,
-      sort: value as ModeSortOption,
-    });
+    if (isCatalogFilters(filters)) {
+      onChange({
+        ...filters,
+        sort: value as ModeSortOption,
+      });
+    } else {
+      onChange({
+        ...filters,
+        sort: value as LibraryFilters['sort'],
+      });
+    }
   };
 
   /**
-   * Handle featured toggle
+   * Handle featured toggle (catalog only)
    */
   const handleFeaturedToggle = (checked: boolean) => {
-    onChange({
-      ...filters,
-      isFeatured: checked || undefined,
-      page: 1, // Reset to first page
-    });
+    if (isCatalogFilters(filters)) {
+      onChange({
+        ...filters,
+        isFeatured: checked || undefined,
+        page: 1, // Reset to first page
+      });
+    }
   };
 
   /**
@@ -216,19 +269,21 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
     onChange({
       ...filters,
       showLikedOnly: checked || undefined,
-      page: 1, // Reset to first page
+      ...(variant === 'catalog' && { page: 1 }), // Reset to first page in catalog
     });
   };
 
   /**
-   * Handle items per page change
+   * Handle items per page change (catalog only)
    */
   const handleLimitChange = (value: string) => {
-    onChange({
-      ...filters,
-      limit: parseInt(value, 10),
-      page: 1, // Reset to first page
-    });
+    if (isCatalogFilters(filters)) {
+      onChange({
+        ...filters,
+        limit: parseInt(value, 10),
+        page: 1, // Reset to first page
+      });
+    }
   };
 
   /**
@@ -237,11 +292,19 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   const handleClearAll = () => {
     setSearchValue('');
     setTagsValue('');
-    onChange({
-      sort: filters.sort, // Keep sort preference
-      limit: filters.limit, // Keep pagination preference
-      page: 1,
-    });
+
+    if (isCatalogFilters(filters)) {
+      onChange({
+        sort: filters.sort, // Keep sort preference
+        limit: filters.limit, // Keep pagination preference
+        page: 1,
+      });
+    } else {
+      onChange({
+        sort: filters.sort, // Keep sort preference
+        viewMode: 'viewMode' in filters ? filters.viewMode : undefined, // Keep view mode
+      });
+    }
   };
 
   /**
@@ -250,12 +313,16 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   const activeFilterCount = React.useMemo(() => {
     let count = 0;
     if (filters.search) count++;
-    if (filters.category) count++;
-    if (filters.tags && filters.tags.length > 0) count++;
-    if (filters.isFeatured) count++;
     if (filters.showLikedOnly) count++;
+
+    if (isCatalogFilters(filters)) {
+      if (filters.category) count++;
+      if (filters.tags && filters.tags.length > 0) count++;
+      if (filters.isFeatured) count++;
+    }
+
     return count;
-  }, [filters]);
+  }, [filters, variant]);
 
   /**
    * Cleanup timeouts on unmount
@@ -276,7 +343,7 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
    */
   const renderFilters = () => (
     <div className="space-y-4">
-      {/* Search Input */}
+      {/* Search Input - Common to both variants */}
       <div className="space-y-2">
         <Label htmlFor="search">Search Modes</Label>
         <div className="relative">
@@ -303,59 +370,63 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
         </div>
       </div>
 
-      {/* Category Select */}
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <Select
-          value={filters.category || 'all'}
-          onValueChange={handleCategoryChange}
-        >
-          <SelectTrigger id="category">
-            <SelectValue placeholder="All Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {CATEGORIES.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
-                {category.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Tags Input */}
-      <div className="space-y-2">
-        <Label htmlFor="tags">
-          Tags
-          <span className="ml-1 text-xs text-muted-foreground">
-            (comma-separated)
-          </span>
-        </Label>
-        <div className="relative">
-          <Input
-            id="tags"
-            type="text"
-            placeholder="e.g., ableton, midi, controller"
-            value={tagsValue}
-            onChange={(e) => handleTagsChange(e.target.value)}
-            className={cn(tagsValue && 'pr-9')}
-          />
-          {tagsValue && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
-              onClick={() => handleTagsChange('')}
-              aria-label="Clear tags"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
+      {/* Category Select - Catalog only */}
+      {variant === 'catalog' && isCatalogFilters(filters) && (
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Select
+            value={filters.category || 'all'}
+            onValueChange={handleCategoryChange}
+          >
+            <SelectTrigger id="category">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {CATEGORIES.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      </div>
+      )}
 
-      {/* Sort Select */}
+      {/* Tags Input - Catalog only */}
+      {variant === 'catalog' && (
+        <div className="space-y-2">
+          <Label htmlFor="tags">
+            Tags
+            <span className="ml-1 text-xs text-muted-foreground">
+              (comma-separated)
+            </span>
+          </Label>
+          <div className="relative">
+            <Input
+              id="tags"
+              type="text"
+              placeholder="e.g., ableton, midi, controller"
+              value={tagsValue}
+              onChange={(e) => handleTagsChange(e.target.value)}
+              className={cn(tagsValue && 'pr-9')}
+            />
+            {tagsValue && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
+                onClick={() => handleTagsChange('')}
+                aria-label="Clear tags"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Sort Select - Common to both variants */}
       <div className="space-y-2">
         <Label htmlFor="sort">Sort By</Label>
         <Select
@@ -366,7 +437,7 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             <SelectValue placeholder="Sort by..." />
           </SelectTrigger>
           <SelectContent>
-            {SORT_OPTIONS.map((option) => (
+            {(variant === 'catalog' ? CATALOG_SORT_OPTIONS : LIBRARY_SORT_OPTIONS).map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -375,19 +446,21 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
         </Select>
       </div>
 
-      {/* Featured Toggle */}
-      <div className="flex items-center justify-between space-x-2">
-        <Label htmlFor="featured" className="cursor-pointer">
-          Show Featured Only
-        </Label>
-        <Switch
-          id="featured"
-          checked={filters.isFeatured || false}
-          onCheckedChange={handleFeaturedToggle}
-        />
-      </div>
+      {/* Featured Toggle - Catalog only */}
+      {variant === 'catalog' && isCatalogFilters(filters) && (
+        <div className="flex items-center justify-between space-x-2">
+          <Label htmlFor="featured" className="cursor-pointer">
+            Show Featured Only
+          </Label>
+          <Switch
+            id="featured"
+            checked={filters.isFeatured || false}
+            onCheckedChange={handleFeaturedToggle}
+          />
+        </div>
+      )}
 
-      {/* Liked Only Toggle */}
+      {/* Liked Only Toggle - Common to both variants */}
       <div className="flex items-center justify-between space-x-2">
         <Label htmlFor="liked-only" className="cursor-pointer">
           Show Liked Only
@@ -399,25 +472,27 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
         />
       </div>
 
-      {/* Items Per Page */}
-      <div className="space-y-2">
-        <Label htmlFor="limit">Items Per Page</Label>
-        <Select
-          value={String(filters.limit || 24)}
-          onValueChange={handleLimitChange}
-        >
-          <SelectTrigger id="limit">
-            <SelectValue placeholder="Items per page" />
-          </SelectTrigger>
-          <SelectContent>
-            {ITEMS_PER_PAGE_OPTIONS.map((option) => (
-              <SelectItem key={option} value={String(option)}>
-                {option} items
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Items Per Page - Catalog only */}
+      {variant === 'catalog' && isCatalogFilters(filters) && (
+        <div className="space-y-2">
+          <Label htmlFor="limit">Items Per Page</Label>
+          <Select
+            value={String(filters.limit || 24)}
+            onValueChange={handleLimitChange}
+          >
+            <SelectTrigger id="limit">
+              <SelectValue placeholder="Items per page" />
+            </SelectTrigger>
+            <SelectContent>
+              {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                <SelectItem key={option} value={String(option)}>
+                  {option} items
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   );
 
@@ -488,4 +563,4 @@ export const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   );
 };
 
-CatalogFilters.displayName = 'CatalogFilters';
+ModeFiltersPanel.displayName = 'ModeFiltersPanel';
