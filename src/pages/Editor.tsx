@@ -240,6 +240,9 @@ const Editor = () => {
 
       setSyncStatus('synced');
       toast.success(`Mode sent successfully to slot ${activeSlotIndex}!`);
+
+      // Auto-refresh slot names after successful write
+      await handleRefreshSlots();
     } catch (error) {
       setSyncStatus('unknown');
       const message = error instanceof Error ? error.message : 'Failed to send mode';
@@ -319,6 +322,14 @@ const Editor = () => {
       });
     }
   }, [cloudMode, modeIdParam, setSearchParams]);
+
+  // Auto-refresh slot names on app load when device connects
+  useEffect(() => {
+    if (device && lcxl3Connected && slotNames.length === 15 && slotNames.every((name, i) => name === `Slot ${i}`)) {
+      // Only auto-refresh if we have default slot names (not yet loaded from device)
+      handleRefreshSlots();
+    }
+  }, [device, lcxl3Connected]);
 
   useEffect(() => {
     saveModeToStorage(mode);
