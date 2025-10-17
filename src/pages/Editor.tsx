@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -71,6 +71,7 @@ const Editor = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('unknown');
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const { device, isConnected: lcxl3Connected, fetchCurrentMode, fetchAllSlotNames } = useLCXL3Device();
+  const previousModeRef = useRef<CustomMode | null>(null);
 
   // Fetch mode from cloud if ID is in query params
   const { data: cloudMode, isLoading: isLoadingCloudMode } = useModeById(
@@ -240,6 +241,9 @@ const Editor = () => {
 
       setSyncStatus('synced');
       toast.success(`Mode sent successfully to slot ${activeSlotIndex}!`);
+
+      // Auto-refresh slot names after successful write
+      await handleRefreshSlots();
     } catch (error) {
       setSyncStatus('unknown');
       const message = error instanceof Error ? error.message : 'Failed to send mode';
@@ -284,16 +288,19 @@ const Editor = () => {
     saveActiveSlot(index);
     console.log('[handleSlotSelect] activeSlotIndex state updated to:', index);
 
-    // Check sync status for new slot
+    // Check sync status with device for new slot
     if (device && lcxl3Connected) {
       try {
         setSyncStatus('syncing');
         const deviceMode = await device.loadCustomMode(index);
         const isSync = await checkSlotSync(mode, deviceMode);
         setSyncStatus(isSync ? 'synced' : 'modified');
-      } catch {
+      } catch (error) {
+        console.error('[handleSlotSelect] Failed to check sync:', error);
         setSyncStatus('unknown');
       }
+    } else {
+      setSyncStatus('unknown');
     }
   };
 
@@ -320,18 +327,32 @@ const Editor = () => {
     }
   }, [cloudMode, modeIdParam, setSearchParams]);
 
+  // Auto-refresh slot names on app load when device connects
+  useEffect(() => {
+    if (device && lcxl3Connected && slotNames.length === 15 && slotNames.every((name, i) => name === `Slot ${i}`)) {
+      // Only auto-refresh if we have default slot names (not yet loaded from device)
+      handleRefreshSlots();
+    }
+  }, [device, lcxl3Connected]);
+
   useEffect(() => {
     saveModeToStorage(mode);
 
-    // Mark as modified when buffer changes (unless we just fetched/sent)
-    // Small delay to avoid race condition with fetch/send
-    const timeoutId = setTimeout(() => {
-      if (syncStatus === 'synced') {
-        setSyncStatus('modified');
-      }
-    }, 100);
+    // Only mark as modified if mode actually changed (not just a re-render)
+    const modeChanged = previousModeRef.current !== null && previousModeRef.current !== mode;
+    previousModeRef.current = mode;
 
-    return () => clearTimeout(timeoutId);
+    if (modeChanged) {
+      // Mark as modified when buffer changes (unless we just fetched/sent)
+      // Small delay to avoid race condition with fetch/send
+      const timeoutId = setTimeout(() => {
+        if (syncStatus === 'synced') {
+          setSyncStatus('modified');
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
   }, [mode, syncStatus]);
 
   return (

@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Check, AlertTriangle, RefreshCw, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SyncStatus } from '@/utils/syncDetection';
@@ -19,11 +20,23 @@ export function SlotCard({
   syncStatus,
   onClick
 }: SlotCardProps) {
-  const syncIcon = {
-    synced: <Check className="w-4 h-4 text-green-500" />,
-    modified: <AlertTriangle className="w-4 h-4 text-orange-500" />,
-    syncing: <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />,
-    unknown: <HelpCircle className="w-4 h-4 text-gray-400" />
+  const syncIconConfig = {
+    synced: {
+      icon: <Check className="w-4 h-4 text-green-500" />,
+      tooltip: 'Editor matches device slot'
+    },
+    modified: {
+      icon: <AlertTriangle className="w-4 h-4 text-orange-500" />,
+      tooltip: 'Editor differs from device slot'
+    },
+    syncing: {
+      icon: <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />,
+      tooltip: 'Checking sync status...'
+    },
+    unknown: {
+      icon: <HelpCircle className="w-4 h-4 text-gray-400" />,
+      tooltip: 'Sync status unknown'
+    }
   }[syncStatus];
 
   return (
@@ -50,7 +63,18 @@ export function SlotCard({
         <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
           {slotIndex}
         </Badge>
-        {isActive && syncIcon}
+        {isActive && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="cursor-help">
+                {syncIconConfig.icon}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{syncIconConfig.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
       <span className="text-sm font-medium text-center line-clamp-1">
         {slotName}
