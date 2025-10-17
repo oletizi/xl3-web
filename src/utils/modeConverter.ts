@@ -142,9 +142,9 @@ export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
   if (!lcxl3Mode.controls) {
     console.warn('No controls found in mode:', lcxl3Mode);
     return {
-      name: lcxl3Mode.name || 'Fetched Mode',
-      description: `Fetched from device on ${new Date().toLocaleString()}`,
-      version: '1.0.0',
+      name: lcxl3Mode.metadata?.name || lcxl3Mode.name || 'Fetched Mode',
+      description: lcxl3Mode.metadata?.description || `Fetched from device on ${new Date().toLocaleString()}`,
+      version: lcxl3Mode.metadata?.version || '1.0.0',
       controls: {},
       createdAt: new Date().toISOString(),
       modifiedAt: new Date().toISOString()
@@ -222,9 +222,9 @@ export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
   }
 
   return {
-    name: lcxl3Mode.name || 'Fetched Mode',
-    description: `Fetched from device on ${new Date().toLocaleString()}`,
-    version: '1.0.0',
+    name: lcxl3Mode.metadata?.name || lcxl3Mode.name || 'Fetched Mode',
+    description: lcxl3Mode.metadata?.description || `Fetched from device on ${new Date().toLocaleString()}`,
+    version: lcxl3Mode.metadata?.version || '1.0.0',
     controls,
     createdAt: lcxl3Mode.metadata?.createdAt instanceof Date
       ? lcxl3Mode.metadata.createdAt.toISOString()

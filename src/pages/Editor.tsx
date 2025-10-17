@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -71,6 +71,7 @@ const Editor = () => {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('unknown');
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const { device, isConnected: lcxl3Connected, fetchCurrentMode, fetchAllSlotNames } = useLCXL3Device();
+  const previousModeRef = useRef<CustomMode | null>(null);
 
   // Fetch mode from cloud if ID is in query params
   const { data: cloudMode, isLoading: isLoadingCloudMode } = useModeById(
@@ -287,16 +288,19 @@ const Editor = () => {
     saveActiveSlot(index);
     console.log('[handleSlotSelect] activeSlotIndex state updated to:', index);
 
-    // Check sync status for new slot
+    // Check sync status with device for new slot
     if (device && lcxl3Connected) {
       try {
         setSyncStatus('syncing');
         const deviceMode = await device.loadCustomMode(index);
         const isSync = await checkSlotSync(mode, deviceMode);
         setSyncStatus(isSync ? 'synced' : 'modified');
-      } catch {
+      } catch (error) {
+        console.error('[handleSlotSelect] Failed to check sync:', error);
         setSyncStatus('unknown');
       }
+    } else {
+      setSyncStatus('unknown');
     }
   };
 
@@ -334,15 +338,21 @@ const Editor = () => {
   useEffect(() => {
     saveModeToStorage(mode);
 
-    // Mark as modified when buffer changes (unless we just fetched/sent)
-    // Small delay to avoid race condition with fetch/send
-    const timeoutId = setTimeout(() => {
-      if (syncStatus === 'synced') {
-        setSyncStatus('modified');
-      }
-    }, 100);
+    // Only mark as modified if mode actually changed (not just a re-render)
+    const modeChanged = previousModeRef.current !== null && previousModeRef.current !== mode;
+    previousModeRef.current = mode;
 
-    return () => clearTimeout(timeoutId);
+    if (modeChanged) {
+      // Mark as modified when buffer changes (unless we just fetched/sent)
+      // Small delay to avoid race condition with fetch/send
+      const timeoutId = setTimeout(() => {
+        if (syncStatus === 'synced') {
+          setSyncStatus('modified');
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
   }, [mode, syncStatus]);
 
   return (
