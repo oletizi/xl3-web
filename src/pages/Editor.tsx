@@ -157,6 +157,14 @@ const Editor = () => {
       toast.info(`Fetching mode from slot ${activeSlotIndex}...`);
 
       const lcxl3Mode = await device.loadCustomMode(activeSlotIndex);
+
+      console.group('=== FETCH DIAGNOSTIC ===');
+      console.log('1. Fetching from slot:', activeSlotIndex);
+      console.log('2. Received mode name:', lcxl3Mode.name);
+      console.log('3. Received controls count:', Object.keys(lcxl3Mode.controls).length);
+      console.log('4. Sample control:', Object.entries(lcxl3Mode.controls)[0]);
+      console.groupEnd();
+
       console.log('Raw mode from device:', lcxl3Mode);
       console.log('Controls array:', lcxl3Mode.controls);
 
@@ -213,7 +221,20 @@ const Editor = () => {
       console.log('[handleSend] typeof activeSlotIndex:', typeof activeSlotIndex);
       toast.info(`Sending mode to slot ${activeSlotIndex}...`);
 
+      // === DIAGNOSTIC LOGGING START ===
+      console.group('=== SEND DIAGNOSTIC ===');
+      console.log('1. activeSlotIndex:', activeSlotIndex);
+      console.log('2. activeSlotIndex type:', typeof activeSlotIndex);
+      console.log('3. mode.name:', mode.name);
+      console.log('4. sample control value:', mode.controls['knob-0']?.ccNumber);
+      console.log('5. device.saveCustomMode:', device.saveCustomMode.toString().substring(0, 200));
+
       const lcxl3Mode = customModeToLCXL3Mode(mode);
+      console.log('6. converted mode name:', lcxl3Mode.name);
+      console.log('7. converted controls count:', Object.keys(lcxl3Mode.controls).length);
+      console.groupEnd();
+      // === DIAGNOSTIC LOGGING END ===
+
       console.log('[handleSend] Calling device.saveCustomMode with slot:', activeSlotIndex);
       await device.saveCustomMode(activeSlotIndex, lcxl3Mode);
 
@@ -316,7 +337,7 @@ const Editor = () => {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
@@ -452,14 +473,14 @@ const Editor = () => {
           {/* Control Properties */}
           <Card className="p-6 bg-gradient-surface border-border/50">
             <h3 className="text-lg font-semibold text-foreground mb-4">Control Properties</h3>
-            
+
             {selectedControl ? (
               <Tabs defaultValue="mapping" className="space-y-4">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="mapping">Mapping</TabsTrigger>
                   <TabsTrigger value="advanced">Advanced</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="mapping" className="space-y-4">
                   <div>
                     <Label className="text-foreground">Control Type</Label>
@@ -467,7 +488,7 @@ const Editor = () => {
                       CC {selectedControlInfo?.cc}
                     </Badge>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="cc-number" className="text-foreground">CC Number</Label>
                     <Input
@@ -480,7 +501,7 @@ const Editor = () => {
                       className="mt-2 bg-background/50"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="midi-channel" className="text-foreground">MIDI Channel</Label>
                     <Input
@@ -493,7 +514,7 @@ const Editor = () => {
                       className="mt-2 bg-background/50"
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label htmlFor="min-val" className="text-foreground">Min Value</Label>
@@ -521,7 +542,7 @@ const Editor = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="advanced" className="space-y-4">
                   <div>
                     <Label htmlFor="control-name" className="text-foreground">Control Label</Label>
@@ -533,14 +554,14 @@ const Editor = () => {
                       className="mt-2 bg-background/50"
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <Label className="text-foreground">LED Feedback</Label>
                     <Button variant="outline" size="sm">
                       <Settings className="w-4 h-4" />
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <Label className="text-foreground">Curve Type</Label>
                     <Button variant="outline" size="sm">
