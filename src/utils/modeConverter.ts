@@ -139,6 +139,16 @@ const LCXL3_TO_APP_CONTROL_MAP: Record<number, string> = {
 export function lcxl3ModeToCustomMode(lcxl3Mode: LCXL3CustomMode): CustomMode {
   const controls: Record<string, ControlMapping> = {};
 
+  // Debug logging
+  console.group('=== lcxl3ModeToCustomMode DEBUG ===');
+  console.log('Raw mode from device:', lcxl3Mode);
+  console.log('mode.name:', lcxl3Mode.name);
+  console.log('mode.metadata:', lcxl3Mode.metadata);
+  console.log('metadata?.name:', lcxl3Mode.metadata?.name);
+  console.log('metadata?.description:', lcxl3Mode.metadata?.description);
+  console.log('metadata?.version:', lcxl3Mode.metadata?.version);
+  console.groupEnd();
+
   if (!lcxl3Mode.controls) {
     console.warn('No controls found in mode:', lcxl3Mode);
     return {
@@ -341,7 +351,7 @@ export function customModeToLCXL3Mode(customMode: CustomMode): LCXL3CustomMode {
   }
 
   return {
-    name: customMode.name.substring(0, 8), // LCXL3 names limited to 8 chars
+    name: customMode.name.substring(0, 18), // LCXL3 names limited to 18 chars (v1.20.18+)
     controls,
     labels,
     metadata: {
